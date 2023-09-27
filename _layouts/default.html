@@ -41,13 +41,11 @@
                 Xuxin Cheng
               </h1>
               <p align='center'>xuxinc [at] cs.cmu.edu</p>
-              <p>I am a M.S. in Robotics student at CMU advised by <a href="https://www.cs.cmu.edu/~dpathak/">Deepak Pathak</a>. 
-                I also work with Prof. <a href="https://hybrid-robotics.berkeley.edu/koushil">Koushil Sreenath</a> at UC Berkeley. 
-              I received my B.S. from <a href="http://english.bit.edu.cn">Beijing Institute of Technology (BIT)</a>.
-              During my undergrad, I worked on Reinforcement Learning based ADAS (Advanced Driver-Assistance Systems) advised by Prof. <a href="https://its.berkeley.edu/people/ching-yao-chan">Ching-Yao Chan</a> at <a href="https://path.berkeley.edu">Berkeley PATH</a>.
+              <p>I am a PhD student at UC San Diego advised by Prof. <a href="https://xiaolonw.github.io">Xiaolong Wang</a>. I earned my M.S. in Robotics at CMU advised by Prof. <a href="https://www.cs.cmu.edu/~dpathak/">Deepak Pathak</a>. 
+                I also worked with Prof. <a href="https://hybrid-robotics.berkeley.edu/koushil">Koushil Sreenath</a> at UC Berkeley. I am interested in general motion generation for real robots.
               </p>
               <p>
-                I love snowboarding 🏂 and scuba diving 🤿 in my free time, checkout more <a href="https://www.instagram.com/tangerine.cheng/">here</a>.
+                I love snowboarding 🏂 and scuba diving 🤿 in my free time.
               </p>
               
               <p style="text-align:center">
@@ -100,7 +98,7 @@
           {% for rsc in site.posts %}
           {% for cat in rsc.categories %}
           {% if cat == 'research' %}
-          <tr {% if rsc.gif %}onmouseout="{{rsc.abbr}}_stop()" onmouseover="{{rsc.abbr}}_start()"{% endif %}>
+          <tr {% if rsc.gif or rsc.video %}onmouseout="{{rsc.abbr}}_stop()" onmouseover="{{rsc.abbr}}_start()"{% endif %}>
             <td style="padding:0px 0px;width:30%;vertical-align:middle;min-width:120px">
               
               <div class="one" style="width:100%; height:auto; max-width:100%">
@@ -111,6 +109,8 @@
                 </div>
                 {% if rsc.gif %}
                 <img src='{{rsc.gif}}' style="width:100%; height:auto; max-width:100%">
+                {% elsif rsc.video %}
+                <video src='{{rsc.video}}' style="width:100%; height:auto; max-width:100%" autoplay muted loop></video>
                 {% else %}
                 <img src='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
                 {% endif %}
