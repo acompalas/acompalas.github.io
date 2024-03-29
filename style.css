@@ -60,6 +60,7 @@ a:hover {
 
 .logo {
   font-size: 2rem;
+  margin-left: -5%; /* Adjust the margin-left value as needed */
 }
 
 .logo:hover {
@@ -102,6 +103,7 @@ a:hover {
   max-height: 0;
   overflow: hidden;
   transition: all 0.3 ease-in-out;
+   z-index: 1;
 }
 
 .menu-links a {
@@ -169,6 +171,31 @@ section {
   height: 80vh;
 }
 
+#profile_pic {
+  width: 250px; /* Set the width of the container */
+  height: 250px; /* Set the height of the container */
+  overflow: hidden; /* Hide overflowing parts of the image */
+  border-radius: 50%; /* Apply circular crop */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Needed for absolute positioning of the image */
+  /*border: 1px solid black; /* Add a black border with 2px width */
+}
+
+#profile_pic img {
+  /* Additional styles for the image */
+  width: 100%; /* Ensure the image takes up the full space of the container */
+  height: auto; /* Maintain aspect ratio */
+  object-fit: cover; /* Ensure the image covers the container */
+  position: absolute; /* Position the image absolutely */
+  
+  /* Center the image within the container */
+  top: 60%;
+  left: 5%;
+  transform: translate(-50%, -50%) scale(3.5) rotate(0deg); /* Static zoom level of 20% and rotate by 45 degrees */
+}
+
 .section__pic-container {
   display: flex;
   height: 400px;
@@ -182,6 +209,7 @@ section {
 }
 
 .section__text p {
+  font-size: 1.75rem;
   font-weight: 600;
 }
 
@@ -324,7 +352,7 @@ section {
   color: rgb(85, 85, 85);
   font-weight: 600;
   font-size: 1.75rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0rem;
 }
 
 .experience-details-container {
@@ -353,32 +381,78 @@ article .icon {
   cursor: default;
 }
 
+.logo {
+  width: 100px; /* Adjust the width to your desired size */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.crisis24-logo {
+  width: 140px; /* Adjust as needed */
+  height: auto; /* Maintain aspect ratio */
+  margin-bottom: 10px;
+  /* Crisis 24 logo specific styles */
+}
+
+.ucsc-logo {
+  width: 105px; /* Adjust as needed */
+  height: auto; /* Maintain aspect ratio */
+  margin-bottom: 10px;
+  /* UC Santa Cruz logo specific styles */
+}
+
 /* PROJECTS SECTION */
 
 #projects {
   position: relative;
 }
 
+.experience-details-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.details-container {
+  width: 48%; /* Adjust as needed */
+  margin-bottom: 2rem; /* Add space between containers */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .color-container {
   border-color: rgb(163, 163, 163);
   background: rgb(250, 250, 250);
+  flex-grow: 1; /* Allow containers to grow */
+  display: flex;
+  flex-direction: column;
 }
 
 .project-img {
   border-radius: 2rem;
-  width: 90%;
-  height: 90%;
+  width: 100%; /* Adjust as needed */
+  height: auto; /* Allow image to maintain aspect ratio */
 }
 
 .project-title {
-  margin: 1rem;
+  margin: auto 0 1rem; /* Adjust margin */
   color: black;
+  text-align: center; /* Center align text */
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center; /* Center align buttons horizontally */
+  margin-top: auto; /* Push buttons to the bottom */
 }
 
 .project-btn {
   color: black;
   border-color: rgb(163, 163, 163);
+  margin: 0 0.001rem; /* Adjust margin to make buttons closer */
 }
+
+
 
 /* CONTACT */
 

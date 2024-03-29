@@ -10,7 +10,7 @@
   </head>
   <body>
     <nav id="desktop-nav">
-      <div class="logo">John Doe</div>
+      <div class="logo">Anderson</div>
       <div>
         <ul class="nav-links">
           <li><a href="#about">About</a></li>
@@ -21,7 +21,7 @@
       </div>
     </nav>
     <nav id="hamburger-nav">
-      <div class="logo">John Doe</div>
+      <div class="logo">Anderson</div>
       <div class="hamburger-menu">
         <div class="hamburger-icon" onclick="toggleMenu()">
           <span></span>
@@ -37,94 +37,115 @@
       </div>
     </nav>
     <section id="profile">
-      <div class="section__pic-container">
-        <img src="./assets/profile-pic.png" alt="John Doe profile picture" />
+      <div class="section__pic-container" id="profile_pic">
+          <img src="./assets/anderson-profile2.png" alt="Anderson profile picture" />
       </div>
       <div class="section__text">
-        <p class="section__text__p1">Hello, I'm</p>
-        <h1 class="title">John Doe</h1>
-        <p class="section__text__p2">Frontend Developer</p>
-        <div class="btn-container">
-          <button
-            class="btn btn-color-2"
-            onclick="window.open('./assets/resume-example.pdf')"
-          >
-            Download CV
-          </button>
-          <button class="btn btn-color-1" onclick="location.href='./#contact'">
-            Contact Info
-          </button>
-        </div>
-        <div id="socials-container">
-          <img
-            src="./assets/linkedin.png"
-            alt="My LinkedIn profile"
-            class="icon"
-            onclick="location.href='https://linkedin.com/'"
-          />
-          <img
-            src="./assets/github.png"
-            alt="My Github profile"
-            class="icon"
-            onclick="location.href='https://github.com/'"
-          />
-        </div>
+          <p class="section__text__p1">Hello, I'm</p>
+          <h1 class="title">Anderson Compalas</h1>
+          <p class="section__text__p2">Aspiring ML Engineer</p>
+          <div class="btn-container">
+              <button
+                  class="btn btn-color-2"
+                  onclick="window.open('./assets/anderson_curriculum_vitae.pdf')"
+              >
+                  Download CV
+              </button>
+              <button class="btn btn-color-1" onclick="location.href='./#contact'">
+                  Contact Info
+              </button>
+          </div>
+          <div id="socials-container">
+              <img
+                  src="./assets/linkedin.png"
+                  alt="My LinkedIn profile"
+                  class="icon"
+                  onclick="location.href='https://www.linkedin.com/in/anderson-compalas/'"
+              />
+              <img
+                  src="./assets/github.png"
+                  alt="My Github profile"
+                  class="icon"
+                  onclick="location.href='https://github.com/acompalas/'"
+              />
+              <!-- Add Instagram logo -->
+              <img
+                  src="./assets/instagram_logo.png"
+                  alt="My Instagram profile"
+                  class="icon"
+                  onclick="location.href='https://www.instagram.com/aj_compalas/'"
+              />
+              <!-- End of Instagram logo -->
+          </div>
       </div>
-    </section>
+  </section>
+  
     <section id="about">
-      <p class="section__text__p1">Get To Know More</p>
+      <p class="section__text__p1">Get to know more</p>
       <h1 class="title">About Me</h1>
       <div class="section-container">
         <div class="section__pic-container">
-          <img
-            src="./assets/about-pic.png"
-            alt="Profile picture"
-            class="about-pic"
-          />
+          <img src="./assets/aboutme.png" alt="Profile picture" class="about-pic" />
         </div>
         <div class="about-details-container">
           <div class="about-containers">
+            <!-- New details-container with the additional h3 section at the top -->
             <div class="details-container">
-              <img
-                src="./assets/experience.png"
-                alt="Experience icon"
-                class="icon"
-              />
-              <h3>Experience</h3>
-              <p>2+ years <br />Frontend Development</p>
+              <img src="./assets/education.png" alt="Experience icon" class="icon" />
+              <h3>Education (In Progress)</h3>
+              <p>Applied Physics B.S. with concentration in Computational Physics<br />Applied Mathematics B.S.<br />Business Management Economics B.A.<br />Computer Science Minor</p>
             </div>
             <div class="details-container">
-              <img
-                src="./assets/education.png"
-                alt="Education icon"
-                class="icon"
-              />
-              <h3>Education</h3>
-              <p>B.Sc. Bachelors Degree<br />M.Sc. Masters Degree</p>
+              <img src="./assets/career.png" alt="Experience icon" class="icon" />
+              <h3>Career Interests</h3>
+              <p>Data Science <br />Machine Learning Engineering <br />Quantitative Research</p>
             </div>
-          </div>
-          <div class="text-container">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic quis
-              reprehenderit et laborum, rem, dolore eum quod voluptate
-              exercitationem nobis, nihil esse debitis maxime facere minus sint
-              delectus velit in eos quo officiis explicabo deleniti dignissimos.
-              Eligendi illum libero dolorum cum laboriosam corrupti quidem,
-              reiciendis ea magnam? Nulla, impedit fuga!
-            </p>
+            <div class="details-container">
+              <img src="./assets/research.png" alt="Research icon" class="icon" />
+              <h3>Research Interests</h3>
+              <p>Machine Learning Theory<br />Scientific Computing<br />Embodied AI <br />Reinforcement Learning <br />Stochastic Modeling <br />Uncertainty Quantification</p>
+            </div>
           </div>
         </div>
       </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='./#experience'"
-      />
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#experience'" />
     </section>
     <section id="experience">
       <p class="section__text__p1">Explore My</p>
       <h1 class="title">Experience</h1>
+      <div class="experience-details-container">
+        <div class="about-containers">
+          <div class="details-container">
+            <img src="./assets/crisis-24-logo.png" alt="GSOC Analyst Logo" class="crisis24-logo">
+            <h3 class="experience-sub-title">GSOC Analyst</h3>
+            <p>Nov 2022 - June 2023</p>
+            <div class="article-container">
+              <ul>
+                <li><p>Utilized computer-based monitoring platforms for data collection and provided concise assessments to security teams</p></li>
+                <li><p>Conducted threat analysis and open-source research for data-driven threat identification.</p></li>
+                <li><p>Managed emergency notification services across 10+ global sites, maintaining detailed records of security operations data.</p></li>
+              </ul>
+            </div>
+          </div>
+          <div class="details-container">
+            <img src="./assets/ucsantacruzlogo.png" alt="Undergraduate Researcher Logo" class="ucsc-logo">
+            <h3 class="experience-sub-title">Undergraduate Researcher</h3>
+            <p>Nov 2023 - Present</p>
+            <div class="article-container">
+              <ul>
+                <li><p>Collaborated on a research project with Professor Razvan Marinescu, using transfer learning with Graph Neural Networks, to accelerate Molecular Dynamics simulations by over 100X.</p></li>
+                <li><p>Managed and executed computationally intensive protein simulations, processing data for over 700 proteins.</p></li>
+                <li><p>Applied strong coding skills to create automated pipelines and train machine learning models, contributing to ongoing research aimed at top-tier scientific publications.</p></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#projects'" />
+    </section>
+    <section id="experience">
+      <p class="section__text__p1">Look at my</p>
+      <h1 class="title">Skills</h1>
       <div class="experience-details-container">
         <div class="about-containers">
           <div class="details-container">
@@ -138,7 +159,6 @@
                 />
                 <div>
                   <h3>HTML</h3>
-                  <p>Experienced</p>
                 </div>
               </article>
               <article>
@@ -149,7 +169,6 @@
                 />
                 <div>
                   <h3>CSS</h3>
-                  <p>Experienced</p>
                 </div>
               </article>
               <article>
@@ -159,8 +178,7 @@
                   class="icon"
                 />
                 <div>
-                  <h3>SASS</h3>
-                  <p>Intermediate</p>
+                  <h3>React</h3>
                 </div>
               </article>
               <article>
@@ -170,36 +188,13 @@
                   class="icon"
                 />
                 <div>
-                  <h3>JavaScript</h3>
-                  <p>Basic</p>
-                </div>
-              </article>
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>TypeScript</h3>
-                  <p>Basic</p>
-                </div>
-              </article>
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>Material UI</h3>
-                  <p>Intermediate</p>
+                  <h3>Flutter</h3>
                 </div>
               </article>
             </div>
           </div>
           <div class="details-container">
-            <h2 class="experience-sub-title">Frontend Development</h2>
+            <h2 class="experience-sub-title">Backend Development</h2>
             <div class="article-container">
               <article>
                 <img
@@ -208,8 +203,7 @@
                   class="icon"
                 />
                 <div>
-                  <h3>PostgreSQL</h3>
-                  <p>Basic</p>
+                  <h3>MongoDB</h3>
                 </div>
               </article>
               <article>
@@ -219,8 +213,7 @@
                   class="icon"
                 />
                 <div>
-                  <h3>Node JS</h3>
-                  <p>Intermediate</p>
+                  <h3>Firebase</h3>
                 </div>
               </article>
               <article>
@@ -230,8 +223,7 @@
                   class="icon"
                 />
                 <div>
-                  <h3>Express JS</h3>
-                  <p>Intermediate</p>
+                  <h3>SQL</h3>
                 </div>
               </article>
               <article>
@@ -242,7 +234,41 @@
                 />
                 <div>
                   <h3>Git</h3>
-                  <p>Intermediate</p>
+                </div>
+              </article>
+            </div>
+          </div>
+          <div class="details-container">
+            <h2 class="experience-sub-title">Machine Learning Frameworks</h2>
+            <div class="article-container">
+              <article>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>Pytorch</h3>
+                </div>
+              </article>
+              <article>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>Tensorflow</h3>
+                </div>
+              </article>
+              <article>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>Scikit Learn</h3>
                 </div>
               </article>
             </div>
@@ -264,72 +290,120 @@
           <div class="details-container color-container">
             <div class="article-container">
               <img
-                src="./assets/project-1.png"
+                src="./assets/slugvitals.png"
                 alt="Project 1"
                 class="project-img"
               />
             </div>
-            <h2 class="experience-sub-title project-title">Project One</h2>
+            <h2 class="experience-sub-title project-title">SlugVitals</h2>
             <div class="btn-container">
               <button
                 class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
+                onclick="location.href='https://github.com/briankhoi/Slug-Vitals'"
               >
-                Github
+                Code
               </button>
               <button
                 class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
+                onclick="location.href='https://devpost.com/software/slugtracker?ref_content=my-projects-tab&ref_feature=my_projects'"
               >
-                Live Demo
+                Demo
               </button>
             </div>
           </div>
           <div class="details-container color-container">
             <div class="article-container">
               <img
-                src="./assets/project-2.png"
+                src="./assets/nbaoracle.PNG"
                 alt="Project 2"
                 class="project-img"
               />
             </div>
-            <h2 class="experience-sub-title project-title">Project Two</h2>
+            <h2 class="experience-sub-title project-title">NBA Oracle</h2>
             <div class="btn-container">
               <button
                 class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
+                onclick="location.href='https://github.com/acompalas/SCAI_Hedge_your_bets'"
               >
-                Github
+                Code
               </button>
               <button
                 class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
+                onclick="location.href='https://docs.google.com/presentation/d/1ueHg1Jn9xf6ZUSSnO7GVo99Hb8J_oFSqN4zlIrbrsmE/edit?usp=sharing'"
               >
-                Live Demo
+                Demo
               </button>
             </div>
           </div>
           <div class="details-container color-container">
             <div class="article-container">
               <img
-                src="./assets/project-3.png"
+                src="./assets/studyai.png"
                 alt="Project 3"
                 class="project-img"
               />
             </div>
-            <h2 class="experience-sub-title project-title">Project Three</h2>
+            <h2 class="experience-sub-title project-title">Study AI</h2>
             <div class="btn-container">
               <button
                 class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
+                onclick="location.href='https://github.com/briankhoi/cruzhacks24'"
               >
-                Github
+                Code
               </button>
               <button
                 class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
+                onclick="location.href='https://devpost.com/software/studyai-ay8we0'"
               >
-                Live Demo
+                Demo
+              </button>
+            </div>
+          </div>
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img
+                src="./assets/kaggle.png"
+                alt="Project 4"
+                class="project-img"
+              />
+            </div>
+            <h2 class="experience-sub-title project-title">Kaggle Image Classification</h2>
+            <div class="btn-container">
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://colab.research.google.com/drive/1twuwQCOLwm30547PDGzINkasNCMCSWjV?usp=sharing'"
+              >
+                Code
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://docs.google.com/document/d/1L_bj0jpsyLUZT3qx94O8gHRgDNUCZ0esZTmiaqXgfJY/edit?usp=sharing'"
+              >
+                Demo
+              </button>
+            </div>
+          </div>
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img
+                src="./assets/budgetbites.png"
+                alt="Project 4"
+                class="project-img"
+              />
+            </div>
+            <h2 class="experience-sub-title project-title">BudgetBites App</h2>
+            <div class="btn-container">
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/acompalas/Sustainabites_AI'"
+              >
+                Code
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://docs.google.com/presentation/d/1cPufxBLLa4Ok5RVEFC7_T_ZiDFOAlPI52RcVvb0Sc38/edit#slide=id.g294e875433c_0_0'"
+              >
+                Demo
               </button>
             </div>
           </div>
@@ -342,28 +416,40 @@
         onclick="location.href='./#contact'"
       />
     </section>
+    
     <section id="contact">
       <p class="section__text__p1">Get in Touch</p>
       <h1 class="title">Contact Me</h1>
       <div class="contact-info-upper-container">
-        <div class="contact-info-container">
-          <img
-            src="./assets/email.png"
-            alt="Email icon"
-            class="icon contact-icon email-icon"
-          />
-          <p><a href="mailto:examplemail@gmail.com">Example@gmail.com</a></p>
-        </div>
-        <div class="contact-info-container">
-          <img
-            src="./assets/linkedin.png"
-            alt="LinkedIn icon"
-            class="icon contact-icon"
-          />
-          <p><a href="https://www.linkedin.com">LinkedIn</a></p>
-        </div>
+          <div class="contact-info-container">
+              <img
+                  src="./assets/email.png"
+                  alt="Email icon"
+                  class="icon contact-icon email-icon"
+              />
+              <p><a href="mailto:examplemail@gmail.com">ajcompalas@gmail.com</a></p>
+          </div>
+          <div class="contact-info-container">
+              <img
+                  src="./assets/linkedin.png"
+                  alt="LinkedIn icon"
+                  class="icon contact-icon"
+              />
+              <p><a href="https://www.linkedin.com/in/anderson-compalas/">LinkedIn</a></p>
+          </div>
+          <!-- Add Instagram icon and text -->
+          <div class="contact-info-container">
+              <img
+                  src="./assets/instagram_logo.png"
+                  alt="Instagram icon"
+                  class="icon contact-icon"
+              />
+              <p><a href="https://www.instagram.com/aj_compalas/">Instagram</a></p>
+          </div>
+          <!-- End of Instagram icon and text -->
       </div>
-    </section>
+  </section>
+  
     <footer>
       <nav>
         <div class="nav-links-container">
@@ -375,7 +461,7 @@
           </ul>
         </div>
       </nav>
-      <p>Copyright &#169; 2023 John Doe. All Rights Reserved.</p>
+      <p>Copyright &#169; 2024 Anderson Compalas. All Rights Reserved.</p>
     </footer>
     <script src="script.js"></script>
   </body>
