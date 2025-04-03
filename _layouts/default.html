@@ -41,8 +41,8 @@
                 Xuxin Cheng
               </h1>
               <p align='center'>xucheng [at] ucsd.edu</p>
-              <p>I am a 2nd year PhD student at UC San Diego advised by Prof. <a href="https://xiaolonw.github.io">Xiaolong Wang</a>. I earned my M.S. in Robotics at CMU advised by Prof. <a href="https://www.cs.cmu.edu/~dpathak/">Deepak Pathak</a>. 
-                I also worked with Prof. <a href="https://hybrid-robotics.berkeley.edu/koushil">Koushil Sreenath</a> at UC Berkeley. I am interested in building real-world robot systems.
+              <p>I am a final-year PhD student at UC San Diego working with Prof. <a href="https://xiaolonw.github.io">Xiaolong Wang</a>. I have had the opportunity to work with Prof. <a href="https://www.cs.cmu.edu/~dpathak/">Deepak Pathak</a> at CMU, as well as Prof. <a href="https://hybrid-robotics.berkeley.edu/koushil">Koushil Sreenath</a>, <a href="https://people.eecs.berkeley.edu/~pabbeel/">Pieter Abbeel</a>, <a href="https://people.eecs.berkeley.edu/~svlevine/">Sergey Levine</a>, <a href="https://xbpeng.github.io/">Xue Bin Peng</a> at UC Berkeley. 
+                I build real-world robot systems.
               </p>
               <p>
                 I love snowboarding 🏂 and scuba diving 🤿 in my free time.
@@ -71,7 +71,7 @@
                 <li>[03/2024] Invited talk at UMich Computer Vision Seminar</li>
                 <li>[03/2024] Invited talk at <a href="https://www.techbeat.net/talk-info?id=854">TechBeat</a></li>
                 <li>[02/2024] Invited talk at <a href="https://www.youtube.com/watch?v=ZKWi_BXq0PQ">Mila Robot Learning Seminar</a></li>
-                <li>[01/2024] Invited talk at <a href="https://www.bilibili.com/video/BV1sF4m137mW/?share_source=copy_web&vd_source=d1854f07b408b9880a4b0901d87a05cf">RL China</a></li>
+                <!-- <li>[01/2024] Invited talk at <a href="https://www.bilibili.com/video/BV1sF4m137mW/?share_source=copy_web&vd_source=d1854f07b408b9880a4b0901d87a05cf">RL China</a></li> -->
                 <li>[10/2023] Invited talk at <a href="https://real.stanford.edu/">Stanford REAL Lab</a></li>
               </ul>
             </td>
@@ -184,90 +184,10 @@
           {% endfor %}
         </table>
         
-        <br><br><br>
-        <h2>Course Projects</h2>
-        <hr>
-
-        <table border="0" style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-          {% for proj in site.posts %}
-          {% for cat in proj.categories %}
-          {% if cat == 'course' %}
-          
-        <tr {% if proj.gif %}onmouseout="{{proj.abbr}}_stop()" onmouseover="{{proj.abbr}}_start()"{% endif %}>
-            <td style="padding:20px 0px;width:30%;vertical-align:middle;min-width:120px">
-              <div class="one" style="width:100%; height:auto; max-width:100%">
-                <div class="two" id='{{proj.image}}' style="width:100%; height:auto; max-width:100%">
-                  <img src='{{proj.image}}' style="width:100%; height:auto; max-width:100%">
-                </div>
-                {% if proj.gif %}
-                <img src='{{proj.gif}}' style="width:100%; height:auto; max-width:100%">
-                {% else %}
-                <img src='{{proj.image}}' style="width:100%; height:auto; max-width:100%">
-                {% endif %}
-              </div>
-              <script type="text/javascript">
-                function {{proj.abbr}}_start() {
-                  document.getElementById('{{proj.image}}').style.opacity = "0";
-                }
-
-                function {{proj.abbr}}_stop() {
-                  document.getElementById('{{proj.image}}').style.opacity = "1";
-                }
-                nlt_stop()
-              </script>
-              <!-- {% if proj.gif %}
-              <img src="{{proj.image}}" onmouseover="src='{{proj.gif}}'" onmouseout="src='{{proj.image}}'" style="width:auto; height:auto; max-width:100%"/>
-              {% else %}
-              <img src="{{proj.image}}" alt="project image" style="width:auto; height:auto; max-width:100%;" />
-              {% endif %} -->
-            </td>
-            <td style="padding:0px 0px 0px 40px;width:70%;vertical-align:middle">
-              <h3>{{proj.title}}</h3>
-              {% if proj.course %}
-              <br>
-              <em>{{proj.course}}</em>
-              {% endif %}
-              <br><br>
-              {% if proj.page %}
-              [<a href="{{proj.page}}">Project page</a>]&nbsp
-              {% endif %}
-              {% if proj.code %}
-              [<a href="{{proj.code}}">Code</a>]&nbsp
-              {% endif %}
-              {% if proj.video %}
-              [<a href="{{proj.video}}">Video</a>]&nbsp
-              {% endif %}
-              <p>
-                {{ proj.intro }}
-              </p>
-              
-            </td>
-          </tr>
-          {% endif %}
-          {% endfor %}
-          {% endfor %}
-        </table>
+        
 
         <br> <br> <br> <br> <hr> <br>
-        <table border="0" style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-          <tr height="30px" style="height: 30px;">
-            <!-- <td style="padding:0px 0px 0px 0px;width:20%;text-align: left;">
-              <img src='images/bit_seal.svg' style="width:62%; height:auto; max-width:100%">
-            </td>
-            <td style="padding:0px 0px 0px 0px;width:20%;text-align: left;">
-              <img src='images/ucberkeleyseal_139_540.png' style="width:62%; height:auto; max-width:100%">
-            </td>
-            <td style="padding:0px 0px 0px 0px;width:20%;text-align: left;">
-              <img src='images/cmu-seal-r.png' style="width:62%; height:auto; max-width:100%">
-            </td> -->
-            <td style="padding:0px 0px 0px 0px;width:40%;text-align: left;">
-            <td style="padding:0px 0px 0px 0px;width:20%;text-align: right;">
-              <script type="text/javascript" id="clustrmaps" src="//cdn.clustrmaps.com/map_v2.js?cl=080808&w=a&t=n&d=nZBgF7n1I0S12HN38AMecrz5p5phy6b0mDGgkopyrTI&co=ffffff&cmo=3acc3a&cmn=ff5353&ct=808080"></script>
-              <td style="padding:0px 0px 0px 0px;width:40%;text-align: left;">
-            </td>
-            
-          </tr>
-        </table>
+        
         <table border="0" style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
           <tr>
           <td style="padding:0px 0px 0px 0px;width:20%;vertical-align:bottom">
