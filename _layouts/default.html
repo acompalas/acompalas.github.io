@@ -254,7 +254,9 @@
                       <img src='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
                     </a>
                   </div>
-                  {% if rsc.video %}
+                  {% if rsc.gif %}
+                    <img src='{{rsc.gif}}' style="width:100%; height:auto; max-width:100%">
+                  {% elsif rsc.video %}
                     <video src='{{rsc.video}}' style="width:100%; height:auto; max-width:100%" autoplay muted loop></video>
                   {% else %}
                     <img src='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
