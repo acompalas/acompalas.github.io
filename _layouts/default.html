@@ -242,33 +242,45 @@
         <br> 
         <hr>
         <br>
-        <h2>Course Projects</h2>
-        <table style="width:100%; border:0; border-spacing:0; border-collapse:separate; margin:auto;">
+        <h2>Projects</h2>
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin:auto;" border="0">
           {% for rsc in site.posts %}
             {% if rsc.course %}
-            <tr>
-              <td style="padding:0; width:30%; vertical-align:middle; min-width:120px">
-                <div style="width:100%; height:auto; max-width:100%">
-                  {% if rsc.gif %}
-                    <img src="{{ rsc.gif }}" style="width:100%; height:auto; max-width:100%">
+            <tr {% if rsc.gif or rsc.video %}onmouseout="{{rsc.abbr}}_stop()" onmouseover="{{rsc.abbr}}_start()"{% endif %}>
+              <td style="padding:0px;width:30%;vertical-align:middle;min-width:120px">
+                <div class="one" style="width:100%; height:auto; max-width:100%">
+                  <div class="two" id='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
+                    <a href="{{rsc.webpage}}">
+                      <img src='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
+                    </a>
+                  </div>
+                  {% if rsc.video %}
+                    <video src='{{rsc.video}}' style="width:100%; height:auto; max-width:100%" autoplay muted loop></video>
                   {% else %}
-                    <img src="{{ rsc.image }}" style="width:100%; height:auto; max-width:100%">
+                    <img src='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
                   {% endif %}
                 </div>
+                <script type="text/javascript">
+                  function {{rsc.abbr}}_start() {
+                    document.getElementById('{{rsc.image}}').style.opacity = "0";
+                  }
+                  function {{rsc.abbr}}_stop() {
+                    document.getElementById('{{rsc.image}}').style.opacity = "1";
+                  }
+                </script>
               </td>
-              <td style="padding:20px 0px 20px 40px; width:70%; vertical-align:middle">
-                <h3>{{ rsc.title }}</h3><br>
-                <em>{{ rsc.course }}</em><br><br>   <!-- 👈 uses your 'course:' field -->
+              <td style="padding:20px 0px 20px 40px;width:70%;vertical-align:middle">
+                <a href="{{rsc.webpage}}"><h3>{{rsc.title}}</h3></a><br>
+                <em>{{rsc.course}}</em><br><br>
+                {{rsc.intro}}<br><br>
                 {% if rsc.links %}
-                  {{ rsc.links }}
+                  {{rsc.links}}
                 {% endif %}
               </td>
             </tr>
             {% endif %}
           {% endfor %}
         </table>
-        
-        
 
         <br> <br> <br> <br> <br>
         
