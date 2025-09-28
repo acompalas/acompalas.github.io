@@ -13,7 +13,7 @@
     </script>
   {% endif %} -->
 
-  <title>Xuxin Cheng</title>
+  <title>Anderson Compalas</title>
 
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
@@ -239,6 +239,36 @@
           {% endfor %}
           {% endfor %}
         </table>
+        <br> 
+        <hr>
+        <br>
+        <h2>Course Projects</h2>
+        <table style="width:100%; border:0; border-spacing:0; border-collapse:separate; margin:auto;">
+          {% for rsc in site.posts %}
+            {% if rsc.course %}
+            <tr>
+              <td style="padding:0; width:30%; vertical-align:middle; min-width:120px">
+                <div style="width:100%; height:auto; max-width:100%">
+                  {% if rsc.gif %}
+                    <img src="{{ rsc.gif }}" style="width:100%; height:auto; max-width:100%">
+                  {% else %}
+                    <img src="{{ rsc.image }}" style="width:100%; height:auto; max-width:100%">
+                  {% endif %}
+                </div>
+              </td>
+              <td style="padding:20px 0px 20px 40px; width:70%; vertical-align:middle">
+                <h3>{{ rsc.title }}</h3><br>
+                <em>{{ rsc.course }}</em><br><br>   <!-- 👈 uses your 'course:' field -->
+                {% if rsc.links %}
+                  {{ rsc.links }}
+                {% endif %}
+              </td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        </table>
+        
+        
 
         <br> <br> <br> <br> <br>
         
