@@ -1,0 +1,119 @@
+---
+layout: none
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixed-Wing UAV Flight Simulator</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 30px 100px 30px;
+    }
+    h1 {
+      font-size: 2rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.3em;
+      margin-bottom: 0.5em;
+    }
+    h2 {
+      font-size: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.3em;
+      margin-top: 2rem;
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    p { margin: 0.8em 0; }
+    a { color: #4183C4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid #eee; margin: 2rem 0; }
+    img { max-width: 100%; display: block; margin: 1rem auto; }
+    strong { color: #222; }
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Fixed-Wing UAV Flight Simulator</h1>
+<p><strong>Flight Dynamics • Controls • Simulation</strong></p>
+<p>A full-stack fixed-wing UAV simulator built in Python to model aircraft dynamics, aerodynamics, wind effects, autopilot control, sensor noise, and state estimation for small-scale autonomous flight.</p>
+<p><a href="https://github.com/acompalas/Fixed-Wing-UAV-Simulator">View Code</a></p>
+<hr>
+
+<h2>Overview</h2>
+<p>This simulator was built incrementally across several labs, each adding a new layer of physical fidelity to the aircraft model. The final system integrates 6-DOF rigid-body dynamics, aerodynamic force and moment modeling, Dryden wind gust simulation, PID-based autopilot control, realistic sensor noise models, and complementary-filter state estimation.</p>
+<hr>
+
+<h2>Lab 1 — 6-DOF Vehicle Dynamics</h2>
+<p>Initial rigid-body aircraft dynamics simulation implementing translational and rotational motion propagation for a fixed-wing UAV.</p>
+<div class="video-wrapper">
+  <iframe src="https://www.youtube.com/embed/fEHzgkmUqk4" allowfullscreen></iframe>
+</div>
+<hr>
+
+<h2>Lab 2 — Aerodynamic Force Modeling</h2>
+<p>Added aerodynamic lift, drag, gravity, propeller thrust, and control surface force models.</p>
+<div class="video-wrapper">
+  <iframe src="https://www.youtube.com/embed/A4cidoObjqI" allowfullscreen></iframe>
+</div>
+<hr>
+
+<h2>Lab 3 — Wind &amp; Gust Simulation</h2>
+<p>Integration of Dryden wind gust modeling and airspeed perturbation effects for realistic environmental disturbances.</p>
+<div class="video-wrapper">
+  <iframe src="https://www.youtube.com/embed/AN8gstgX21U" allowfullscreen></iframe>
+</div>
+<div class="video-wrapper">
+  <iframe src="https://www.youtube.com/embed/hc056XYiPCE" allowfullscreen></iframe>
+</div>
+<hr>
+
+<h2>Lab 4 — Closed-Loop Autopilot Control</h2>
+<p>Successive-loop autopilot implementation using PI, PD, and PID controllers for course, altitude, and airspeed tracking.</p>
+<div class="video-wrapper">
+  <iframe src="https://www.youtube.com/embed/CdzHuF2jWl4" allowfullscreen></iframe>
+</div>
+<div class="video-wrapper">
+  <iframe src="https://www.youtube.com/embed/La9PldgLFug" allowfullscreen></iframe>
+</div>
+<hr>
+
+<h2>Lab 5 — Sensor Noise Modeling</h2>
+<p>Realistic IMU, GPS, pressure, and magnetometer sensor noise models added to the simulation pipeline.</p>
+<div class="video-wrapper">
+  <iframe src="https://www.youtube.com/embed/GkJo40D_uTM" allowfullscreen></iframe>
+</div>
+<hr>
+
+<h2>Lab 6 — State Estimation</h2>
+<p>Complementary filter-based state estimation fusing accelerometer, gyroscope, and GPS measurements to recover aircraft state under noisy conditions.</p>
+<hr>
+
+<p><a href="/">← Back to Portfolio</a></p>
+
+</body>
+</html>

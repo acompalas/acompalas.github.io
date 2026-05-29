@@ -1,0 +1,261 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <!-- {% if jekyll.environment == 'production' %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-T1CLN7VBVH"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-T1CLN7VBVH');
+    </script>
+  {% endif %} -->
+
+  <title>Anderson Compalas</title>
+
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+  <meta name="author" content="{{ site.name }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css" />
+  <link rel="shortcut icon" type="images/png" href="images/favicon.png">
+  <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
+  <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css"> -->
+  <link href='https://fonts.googleapis.com/css?family=Nunito' rel='stylesheet'>
+  {% if site.google_analytics and jekyll.environment == 'production' %}
+  {% include analytics.html %}
+  {% endif %}
+</head>
+
+<body>
+  <table style="width:100%;max-width:800px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+    <tr style="padding:0px">
+      <td style="padding:0px">
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;" border="0">
+          <tr style="padding:0px">
+            <td style="padding:1.5%;width:70%;vertical-align:middle">
+              <h1>
+                Anderson Compalas
+              </h1>
+              <p align='center'>acompalas@ucsd.edu</p>
+              <p>I am a first year MS student in the Intelligent Systems: Robotics and Control program at UC San Diego. I received a B.S. in Applied Mathematics at UC Santa Cruz in 2025. As an undergraduate at UCSC, I had the opportunity to work with <a href="http://eric-lab.soe.ucsc.edu/home">Eric Wang</a>, tutoring for his class in <a href="https://catalog.ucsc.edu/en/current/general-catalog/courses/cse-computer-science-and-engineering/upper-division/cse-142"> machine learning</a>, 
+                and helping out with research in multi-modal AI at his <a href="http://eric-lab.soe.ucsc.edu/home">lab</a>. 
+              </p>
+              <p>
+                Right now I am looking to pursue research in deep reinforcement learning and Vision-Language-Action models, with applications in imitation learning, dexterous manipulation, legged robotics, and humanoids.
+              </p>
+              
+              <p style="text-align:center">
+                <a href="/docs/anderson_cv.pdf">CV</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="https://github.com/acompalas">GitHub</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                <!-- <a href="https://scholar.google.com/citations?hl=en&user=Z8vhOxYAAAAJ&view_op=list_works&sortby=pubdate">Google Scholar</a>&nbsp;&nbsp;|&nbsp;&nbsp; -->
+                <!-- <a href="https://twitter.com/xuxin_cheng">Twitter</a> -->
+              </p>
+            </td>
+            <td style="padding:0%;width:100%;max-width:100%">
+              <div style="width:100%; aspect-ratio:4/5; overflow:hidden; border-radius:5%; margin-top:30%;">
+                <img src="images/anderson_profile.png"
+                     alt="profile photo"
+                     style="width:100%; height:100%; object-fit:cover; object-position:100% 20%; transform:scale(1.2);">
+              </div>
+              
+            </td>
+          </tr>
+        </table>
+        
+
+        <h2>Research</h2>
+        <hr>
+        * denotes equal contribution
+        <script >
+        function togglebib(paperid)
+        {
+            var paper = document.getElementById(paperid) ;
+            var bib = paper.getElementsByTagName('blockquote') ;
+            if (bib.length > 0) {
+                if (bib [0] .style.display == 'none') {
+                    bib [0] .style.display = 'block' ;
+                } else {
+                    bib [0] .style.display = 'none' ;
+                }
+            }
+        }
+        </script>
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;" border="0">
+          {% for rsc in site.posts %}
+          {% for cat in rsc.categories %}
+          {% if cat == 'research' %}
+          <tr {% if rsc.gif or rsc.video %}onmouseout="{{rsc.abbr}}_stop()" onmouseover="{{rsc.abbr}}_start()"{% endif %}>
+            <td style="padding:0px 0px;width:30%;vertical-align:middle;min-width:120px">
+              
+              <div class="one" style="width:100%; height:auto; max-width:100%">
+                <div class="two" id='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
+                  <a href="{{rsc.webpage}}">
+                    <img src='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
+                  </a>
+                </div>
+                {% if rsc.gif %}
+                <img src='{{rsc.gif}}' style="width:100%; height:auto; max-width:100%">
+                {% elsif rsc.video %}
+                <video src='{{rsc.video}}' style="width:100%; height:auto; max-width:100%" autoplay muted loop></video>
+                {% else %}
+                <img src='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
+                {% endif %}
+              </div>
+              <script type="text/javascript">
+                function {{rsc.abbr}}_start() {
+                  document.getElementById('{{rsc.image}}').style.opacity = "0";
+                }
+
+                function {{rsc.abbr}}_stop() {
+                  document.getElementById('{{rsc.image}}').style.opacity = "1";
+                }
+                nlt_stop()
+              </script>
+              <!-- {% if rsc.gif %}
+              <img src="{{rsc.image}}" onmouseover="src='{{rsc.gif}}'" onmouseout="src='{{rsc.image}}'" style="width:100%; height:auto; max-width:100%"/>
+              {% else %}
+              <img src="{{rsc.image}}" alt="research image" style="width:auto; height:auto; max-width:100%" />
+              {% endif %} -->
+            </td>
+            <td style="padding:20px 0px 20px 40px;width:70%;vertical-align:middle">
+                <a href="{{rsc.webpage}}"><h3>{{rsc.title}}</h3></a><br>
+              
+              {% if rsc.author %}
+              {{rsc.author}}
+              {% endif %}
+
+              {% if rsc.publishedOn %}
+              <br>
+              <em>{{rsc.publishedOn}}</em>
+              {% endif %}<br><br>
+              
+              {% if rsc.links %}
+              {{rsc.links}}
+                {% if rsc.bib %}
+                  | <a href="javascript:togglebib('{{rsc.abbr}}')">BibTeX</a> <br>
+                  <div class="paper" id="{{rsc.abbr}}">
+                    <blockquote style="display:none">
+                    <!-- <pre xml:space="preserve" style="display:none"> -->
+                      <!-- <embed src="{{rsc.bib}}" type="text/plain" width="100%" height="200px" /> -->
+                      <!-- <object data="{{rsc.bib}}" width="100%"></object> -->
+                      <!-- {{rsc.bib}} -->
+                      <iframe src="{{rsc.bib}}" scrolling='auto' frameborder='0' width="100%" height="100%">
+                      </iframe>
+                    <!-- </pre> -->
+                    </blockquote>
+                  </div>
+                {% endif %}
+              {% endif %}
+              
+              <!-- <blockquote>
+@article{fu2022learning,
+  author = {Fu, Zipeng and Cheng, Xuxin and Pathak, Deepak},
+  title  = {Learning a Unified Policy for Whole-Body Control of Manipulation and Locomotion},
+  journal= {Conference on Robot Learning (CoRL)},
+  year   = {2022}
+}
+              </blockquote> -->
+              
+              {% if rsc.media %}
+              Media: {{rsc.media}}&nbsp
+              {% endif %}
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+          {% endfor %}
+        </table>
+        
+        
+
+        <br><br>
+
+        <h2>Projects</h2>
+        <hr>
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;" border="0">
+          {% for rsc in site.posts %}
+          {% for cat in rsc.categories %}
+          {% if cat == 'course' %}
+          <tr {% if rsc.gif or rsc.video %}onmouseout="{{rsc.abbr}}_stop()" onmouseover="{{rsc.abbr}}_start()"{% endif %}>
+            <td style="padding:0px 0px;width:30%;vertical-align:middle;min-width:120px">
+              <div class="one" style="width:100%; height:auto; max-width:100%">
+                <div class="two" id='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
+                  {% if rsc.page %}
+                  <a href="{{rsc.page}}">
+                  {% elsif rsc.code %}
+                  <a href="{{rsc.code}}">
+                  {% else %}
+                  <a>
+                  {% endif %}
+                    <img src='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
+                  </a>
+                </div>
+                {% if rsc.gif %}
+                <img src='{{rsc.gif}}' style="width:100%; height:auto; max-width:100%">
+                {% elsif rsc.video %}
+                <video src='{{rsc.video}}' style="width:100%; height:auto; max-width:100%" autoplay muted loop></video>
+                {% else %}
+                <img src='{{rsc.image}}' style="width:100%; height:auto; max-width:100%">
+                {% endif %}
+              </div>
+              {% if rsc.gif or rsc.video %}
+              <script type="text/javascript">
+                function {{rsc.abbr}}_start() {
+                  document.getElementById('{{rsc.image}}').style.opacity = "0";
+                }
+                function {{rsc.abbr}}_stop() {
+                  document.getElementById('{{rsc.image}}').style.opacity = "1";
+                }
+                nlt_stop()
+              </script>
+              {% endif %}
+            </td>
+            <td style="padding:20px 0px 20px 40px;width:70%;vertical-align:middle">
+              {% if rsc.page %}
+              <a href="{{rsc.page}}"><h3>{{rsc.title}}</h3></a>
+              {% else %}
+              <h3>{{rsc.title}}</h3>
+              {% endif %}
+              {% if rsc.course %}
+              <br><em>{{rsc.course}}</em>
+              {% endif %}
+              <br><br>
+              {% if rsc.intro %}
+              <p>{{rsc.intro}}</p>
+              {% endif %}
+              {% if rsc.code %}
+              <a href="{{rsc.code}}">Code</a>
+              {% endif %}
+              {% if rsc.video %}
+              &nbsp;|&nbsp;<a href="{{rsc.video}}">Video</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+          {% endfor %}
+        </table>
+
+        <br> <br> <br> <br> <br>
+        
+        <table border="0" style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+          <tr>
+          <td style="padding:0px 0px 0px 0px;width:20%;vertical-align:bottom">
+            <p style="text-align:right;font-size:small;">
+              <!-- <a style="font-size:small;" href="https://github.com/chengxuxin/chengxuxin.github.io">source code</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+              <a style="font-size:small;" href="https://jonbarron.info">website template</a>
+            </p>
+          </td>
+          </tr>
+        </table>
+      
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+

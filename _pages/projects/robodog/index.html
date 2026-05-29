@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robodog: Quadruped Locomotion Environments in Isaac Sim/Lab</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 30px 100px 30px;
+    }
+    h1 { font-size: 2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 1.5rem; }
+    p { margin: 0.8em 0; }
+    a { color: #4183C4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid #eee; margin: 2rem 0; }
+    img { max-width: 100%; display: block; margin: 1rem auto; border: 1px solid #eee; }
+    figcaption { text-align: center; font-size: 14px; color: #666; margin-top: 0.5rem; }
+    strong { color: #222; }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.4rem 0; }
+    .venue { color: #555; font-style: italic; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+
+<h1>Robodog: Quadruped Locomotion Environments in Isaac Sim/Lab</h1>
+<p class="venue"><a href="https://hare.engineering.ucsc.edu/">HARE Lab</a>, UC Santa Cruz — September 2024 – June 2025</p>
+<hr>
+
+<h2>Overview</h2>
+<p>As an undergraduate researcher at the HARE Lab, I contributed to the development of simulation infrastructure for reinforcement learning-based quadruped locomotion on the Unitree B1 robot. The work focused on building out the Isaac Sim/Lab environment pipeline — designing terrain conditions, configuring simulation tooling, and setting up experiment scaffolding to support future RL policy training.</p>
+<p>While I graduated before the lab reached full policy training, I was able to design and implement a variety of terrain environments in Isaac Sim 4.5.0, including the rough terrain shown below.</p>
+<hr>
+
+<h2>Terrain Design</h2>
+<figure>
+  <img src="/_pages/projects/robodog/demo.png" alt="Rough terrain mesh in Isaac Sim 4.5.0">
+  <figcaption>Rough terrain mesh generated in Isaac Sim 4.5.0 for quadruped locomotion training.</figcaption>
+</figure>
+<p>Terrain conditions were designed to challenge locomotion policies across a range of difficulty levels. Diverse terrain variations included rough uneven ground, slopes, steps, and mixed surfaces — all parameterized to enable curriculum learning during RL training.</p>
+<hr>
+
+<h2>Contributions</h2>
+<ul>
+  <li>Developed simulation environments for quadruped locomotion on the Unitree B1 using NVIDIA Isaac Sim/Lab</li>
+  <li>Designed and implemented diverse terrain conditions to support reinforcement learning-based locomotion tasks</li>
+  <li>Contributed to the robot learning pipeline, including environment setup, simulation tooling, and experiment configuration</li>
+  <li>Supported RL workflows by designing terrain variations and simulation setups for locomotion research</li>
+</ul>
+<hr>
+
+<h2>Tools & Stack</h2>
+<ul>
+  <li>NVIDIA Isaac Sim 4.5.0 / Isaac Lab</li>
+  <li>Python</li>
+  <li>Unitree B1 quadruped robot</li>
+</ul>
+<hr>
+
+<p><a href="/">← Back to Portfolio</a></p>
+
+</body>
+</html>
