@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Self-Supervised 3D Representations for 3D Diffusion Policy</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 30px 100px 30px;
+    }
+    h1 { font-size: 2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 1.5rem; }
+    p { margin: 0.8em 0; }
+    a { color: #4183C4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid #eee; margin: 2rem 0; }
+    img { max-width: 100%; display: block; margin: 1rem auto; border: 1px solid #eee; }
+    strong { color: #222; }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.4rem 0; }
+    .venue { color: #555; font-style: italic; margin-bottom: 1rem; }
+    .note { font-size: 13px; color: #666; margin-top: 0.3rem; text-align: center; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1rem 0; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 1rem 0; }
+    .grid-2 img, .grid-3 img { margin: 0; width: 100%; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 1rem 0;
+    }
+    th { background: #f6f8fa; border: 1px solid #e1e4e8; padding: 6px 10px; text-align: center; }
+    td { border: 1px solid #e1e4e8; padding: 6px 10px; text-align: center; }
+    td.l { text-align: left; }
+  </style>
+</head>
+<body>
+
+<h1>Self-Supervised 3D Representations for 3D Diffusion Policy</h1>
+<p class="venue">UC San Diego, ECE 285: Deep Generative Models · Spring Quarter 2026</p>
+<p>
+  <a href="https://github.com/acompalas/Point-Jepa-DP3">Code</a>
+  &nbsp;|&nbsp;
+  <a href="/docs/ECE_285_Final_Project_Report.pdf">Report</a>
+</p>
+<hr>
+
+<h2>Overview</h2>
+<p>
+  <a href="https://github.com/YanjieZe/3D-Diffusion-Policy">3D Diffusion Policy (DP3)</a> achieves strong visuomotor manipulation performance using a deliberately simple point cloud encoder: a per-point MLP with global max pooling, trained end-to-end from demonstrations. Prior work shows that richer supervised 3D encoders (PointNet++, PointNeXt) consistently hurt DP3 performance in the low-data regime. This project investigates whether a self-supervised 3D encoder can do better.
+</p>
+<p>
+  The contribution is entirely an integration experiment. We take the pretrained <a href="https://github.com/Ayumu-J-S/Point-JEPA">Point-JEPA</a> checkpoint as-is, freeze it, and drop it directly into the DP3 pipeline as an encoder replacement, adding only a new <code>PointJEPAExtractor</code> module, a Hydra config, and Python 3.8 compatibility patches. No modifications were made to either the Point-JEPA or DP3 codebases beyond this. Point-JEPA is a joint-embedding predictive architecture pretrained on ShapeNet-55 that predicts abstract latent representations of masked spatial regions, encouraging global geometric structure capture. We evaluate the frozen encoder at three projection dimensionalities (64, 128, 256) on three Adroit dexterous manipulation tasks with 10 expert demonstrations each.
+</p>
+<hr>
+
+<h2>Tasks</h2>
+
+<div class="grid-3">
+  <div>
+    <img src="figs/adroit_hammer_episode0_rgb_lastframe.png" alt="Hammer RGB">
+    <p class="note">Hammer</p>
+  </div>
+  <div>
+    <img src="figs/adroit_door_episode0_rgb_lastframe.png" alt="Door RGB">
+    <p class="note">Door</p>
+  </div>
+  <div>
+    <img src="figs/adroit_pen_episode0_rgb_lastframe.png" alt="Pen RGB">
+    <p class="note">Pen</p>
+  </div>
+  <div>
+    <img src="figs/adroit_hammer_episode0_pointcloud_lastframe.png" alt="Hammer point cloud">
+    <p class="note">Hammer (point cloud)</p>
+  </div>
+  <div>
+    <img src="figs/adroit_door_episode0_pointcloud_lastframe.png" alt="Door point cloud">
+    <p class="note">Door (point cloud)</p>
+  </div>
+  <div>
+    <img src="figs/adroit_pen_episode0_pointcloud_lastframe.png" alt="Pen point cloud">
+    <p class="note">Pen (point cloud)</p>
+  </div>
+</div>
+
+<p>The policy observes only the 512-point xyz point cloud and 24-dim proprioceptive state, not the RGB image. The point clouds capture hand and object geometry but lack the visual detail of RGB.</p>
+<hr>
+
+<h2>Policy Rollouts</h2>
+
+<h3>DP3 Baseline</h3>
+<div class="grid-3">
+  <div>
+    <img src="gifs/dp3_hammer.gif" alt="DP3 hammer">
+    <p class="note">Hammer (cost 0.95)</p>
+  </div>
+  <div>
+    <img src="gifs/dp3_door.gif" alt="DP3 door">
+    <p class="note">Door (score 0.65)</p>
+  </div>
+  <div>
+    <img src="gifs/dp3_pen.gif" alt="DP3 pen">
+    <p class="note">Pen (score 0.80)</p>
+  </div>
+</div>
+
+<h3>Point-JEPA (best variant per task)</h3>
+<div class="grid-3">
+  <div>
+    <img src="gifs/point_jepa_hammer.gif" alt="JEPA hammer">
+    <p class="note">Hammer, JEPA-128 (score 0.80)</p>
+  </div>
+  <div>
+    <img src="gifs/point_jepa_door.gif" alt="JEPA door">
+    <p class="note">Door, JEPA-64 (score 0.70)</p>
+  </div>
+  <div>
+    <img src="gifs/point_jepa_pen.gif" alt="JEPA pen">
+    <p class="note">Pen, JEPA-256 (score 0.40)</p>
+  </div>
+</div>
+<hr>
+
+<h2>Results</h2>
+
+<table>
+  <thead>
+    <tr><th>Model</th><th>d<sub>out</sub></th><th>Hammer</th><th>Pen</th><th>Door</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="l"><strong>DP3 (baseline)</strong></td><td>64</td><td><strong>0.950</strong></td><td><strong>0.800</strong></td><td>0.650</td></tr>
+    <tr><td class="l">JEPA-64</td><td>64</td><td>0.450</td><td>0.250</td><td><strong>0.700</strong></td></tr>
+    <tr><td class="l">JEPA-128</td><td>128</td><td>0.800</td><td>0.375</td><td>0.600</td></tr>
+    <tr><td class="l">JEPA-256</td><td>256</td><td>0.500</td><td>0.400</td><td>0.650</td></tr>
+  </tbody>
+</table>
+
+<p>Peak <code>test_mean_score</code> (fraction of 20 rollouts succeeding) across 3000 training epochs. JEPA-64 is the only model across all tasks and variants to strictly exceed the baseline's peak, on door (+5%). Results are otherwise mixed.</p>
+<hr>
+
+<h2>Training Dynamics</h2>
+
+<h3>Hammer</h3>
+<div class="grid-2">
+  <div>
+    <img src="figs/hammer_test_mean_score.png" alt="Hammer test score">
+    <p class="note">Test success rate over training</p>
+  </div>
+  <div>
+    <img src="figs/hammer_train_loss.png" alt="Hammer train loss">
+    <p class="note">Diffusion loss (log scale)</p>
+  </div>
+</div>
+<p>All JEPA variants converge to near-zero diffusion loss within 20-30 epochs vs. hundreds for the baseline, yet the baseline achieves task success far earlier. JEPA-128 eventually reaches 0.80 but the baseline stays at 0.95.</p>
+
+<h3>Door</h3>
+<div class="grid-2">
+  <div>
+    <img src="figs/door_test_mean_score.png" alt="Door test score">
+    <p class="note">Test success rate over training</p>
+  </div>
+  <div>
+    <img src="figs/door_train_loss.png" alt="Door train loss">
+    <p class="note">Diffusion loss (log scale)</p>
+  </div>
+</div>
+<p>JEPA-64 eventually reaches 0.70 at epoch 2200, surpassing the baseline's peak of 0.65. All four runs converge to nearly identical diffusion loss, so loss is an unreliable proxy for task performance here.</p>
+
+<h3>Pen</h3>
+<div class="grid-2">
+  <div>
+    <img src="figs/pen_test_mean_score.png" alt="Pen test score">
+    <p class="note">Test success rate over training</p>
+  </div>
+  <div>
+    <img src="figs/pen_train_loss.png" alt="Pen train loss">
+    <p class="note">Diffusion loss (log scale)</p>
+  </div>
+</div>
+<p>All JEPA variants substantially underperform (peak 0.25-0.40 vs. 0.80 baseline). Identical diffusion loss curves but very different success rates confirm that loss is not a reliable policy quality indicator when encoder alignment is the bottleneck.</p>
+<hr>
+
+<h2>Why It Works on Door but Not Pen</h2>
+<p>
+  Point-JEPA's authors explicitly note its emphasis on global over local features as a limitation. Our results map directly onto this: the performance ordering corresponds precisely to how much global vs. local geometric reasoning each task requires.
+</p>
+<ul>
+  <li><strong>Door:</strong> Locate a handle (global), grasp, rotate. JEPA's global descriptor helps; JEPA-64 exceeds the baseline.</li>
+  <li><strong>Hammer:</strong> Align tool with nail (semi-global), strike. JEPA-128 nearly matches.</li>
+  <li><strong>Pen:</strong> Reorient in-hand (local). Fine-grained finger-object contact geometry is critical. All JEPA variants substantially underperform.</li>
+</ul>
+<p>
+  The ShapeNet domain gap is also a factor: Point-JEPA was pretrained on clean, normalized CAD objects, while Adroit point clouds are in robot workspace coordinates and include the robot hand alongside the object.
+</p>
+<hr>
+
+<p><a href="/">&larr; Back to Portfolio</a></p>
+
+</body>
+</html>
