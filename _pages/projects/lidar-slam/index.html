@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LiDAR-Based SLAM with Pose Graph Optimization</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 30px 100px 30px;
+    }
+    h1 { font-size: 2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 1.5rem; }
+    p { margin: 0.8em 0; }
+    a { color: #4183C4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid #eee; margin: 2rem 0; }
+    img { max-width: 100%; display: block; margin: 1rem auto; border: 1px solid #eee; }
+    figcaption { text-align: center; font-size: 14px; color: #666; margin-top: 0.5rem; margin-bottom: 1rem; }
+    strong { color: #222; }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.4rem 0; }
+    .venue { color: #555; font-style: italic; margin-bottom: 1rem; }
+    .img-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 1rem 0;
+    }
+    .img-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin: 1rem 0;
+    }
+    .img-grid-4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 6px;
+      margin: 1rem 0;
+    }
+    .img-grid-2 img,
+    .img-grid-3 img,
+    .img-grid-4 img { margin: 0; width: 100%; }
+    .note {
+      font-size: 13px;
+      color: #666;
+      margin-top: 0.3rem;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 1rem 0;
+    }
+    th {
+      background: #f6f8fa;
+      border: 1px solid #e1e4e8;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    td {
+      border: 1px solid #e1e4e8;
+      padding: 6px 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>LiDAR-Based SLAM with Pose Graph Optimization</h1>
+<p class="venue">UC San Diego, ECE 276A: Sensing &amp; Estimation in Robotics · Winter Quarter 2026</p>
+<p>
+  <a href="https://github.com/acompalas/ECE276A-PR2">Code</a>
+  &nbsp;|&nbsp;
+  <a href="/docs/ECE_276A_PR2.pdf">Report</a>
+</p>
+<hr>
+
+<h2>Overview</h2>
+<p>
+  This project implements a complete LiDAR SLAM pipeline on a differential-drive robot equipped with wheel encoders, an IMU, a Hokuyo UTM-30LX LiDAR, and a Kinect RGBD camera. The pipeline has four stages: encoder/IMU odometry, ICP scan matching, probabilistic occupancy and texture mapping, and GTSAM pose graph optimization with loop closure. Results are presented for two indoor datasets collected in the same building.
+</p>
+<p>
+  Dataset provided by Prof. Nikolay Atanasov as part of ECE 276A. Encoder/IMU/LiDAR data is included in the project repository; Kinect RGBD data is available separately at the
+  <a href="https://ucsdcloud-my.sharepoint.com/:f:/g/personal/natanasov_ucsd_edu/IgAc7jO0VlruT4_8drVPscWYARiI6i60bAeeUxMoIsogywM?e=sJTlFp">course SharePoint</a>.
+</p>
+<hr>
+
+<h2>Pipeline</h2>
+
+<h3>Part 1: Encoder/IMU Odometry</h3>
+<p>
+  Linear velocity is estimated from four wheel encoder counts using the differential-drive model. Yaw rate is taken from the IMU z-axis and interpolated to encoder timestamps. Exact discrete-time integration (sinc-based) propagates poses forward, avoiding linearization error for large heading changes.
+</p>
+
+<div class="img-grid-2">
+  <div>
+    <img src="Dataset_20_Odometry_Trajectory.png" alt="Dataset 20 odometry">
+    <p class="note">Dataset 20 odometry trajectory</p>
+  </div>
+  <div>
+    <img src="Dataset_21_Odometry_Trajectory.png" alt="Dataset 21 odometry">
+    <p class="note">Dataset 21 odometry trajectory</p>
+  </div>
+</div>
+
+<h3>Part 2: ICP Scan Matching</h3>
+<p>
+  2D ICP aligns consecutive Hokuyo scans to refine the odometry trajectory. Each ICP step is initialized from the odometry-predicted relative transform. A key detail is the source/target convention: the newer scan is passed as source and the older as target, yielding the correctly signed relative transform for pose chaining. Steps where ICP MSE exceeds 0.05 fall back to the odometry estimate.
+</p>
+<p>
+  ICP trajectories are consistently more compact than odometry, removing wheel-slip accumulation over long straight corridors. Both datasets show the same L-shaped floor plan topology preserved through scan matching.
+</p>
+
+<div class="img-grid-2">
+  <div>
+    <img src="Dataset_20_Odometry_vs_ICP_Trajectory.png" alt="Dataset 20 odometry vs ICP">
+    <p class="note">Dataset 20: odometry (blue) vs. ICP (red)</p>
+  </div>
+  <div>
+    <img src="Dataset_21_Odometry_vs_ICP_Trajectory.png" alt="Dataset 21 odometry vs ICP">
+    <p class="note">Dataset 21: odometry (blue) vs. ICP (red)</p>
+  </div>
+</div>
+
+<h3>ICP Warm-Up: 3D Point Cloud Registration</h3>
+<p>
+  Before applying ICP to 2D scans, the algorithm was validated on depth images of two objects. Each canonical model (blue) was aligned to four observed point clouds (red) using yaw-discretized initialization over 36 angles. The asymmetric drill aligned accurately across all viewpoints (mean MSE 1.9 x 10<sup>-4</sup> m<sup>2</sup>). The near-cylindrical liquid container was harder, with mean MSE 1.1 x 10<sup>-3</sup> m<sup>2</sup>, due to rotational ambiguity in the yaw direction.
+</p>
+
+<div class="img-grid-4">
+  <div>
+    <img src="icp_drill_0.png" alt="Drill PC0">
+    <p class="note">Drill PC 0</p>
+  </div>
+  <div>
+    <img src="icp_drill_1.png" alt="Drill PC1">
+    <p class="note">Drill PC 1</p>
+  </div>
+  <div>
+    <img src="icp_drill_2.png" alt="Drill PC2">
+    <p class="note">Drill PC 2</p>
+  </div>
+  <div>
+    <img src="icp_drill_3.png" alt="Drill PC3">
+    <p class="note">Drill PC 3</p>
+  </div>
+  <div>
+    <img src="icp_liq_container_0.png" alt="Liquid container PC0">
+    <p class="note">Container PC 0</p>
+  </div>
+  <div>
+    <img src="icp_liq_container_1.png" alt="Liquid container PC1">
+    <p class="note">Container PC 1</p>
+  </div>
+  <div>
+    <img src="icp_liq_container_2.png" alt="Liquid container PC2">
+    <p class="note">Container PC 2</p>
+  </div>
+  <div>
+    <img src="icp_liq_container_3.png" alt="Liquid container PC3">
+    <p class="note">Container PC 3</p>
+  </div>
+</div>
+
+<h3>Part 3: Occupancy and Texture Mapping</h3>
+<p>
+  A probabilistic log-odds occupancy grid is built from the ICP trajectory and LiDAR scans using Bresenham ray casting. Asymmetric updates (occupied +2.0, free -0.5) reflect the high reliability of valid Hokuyo hits. No-return beams carve free space without marking occupied endpoints, improving corridor clarity. Kinect RGBD images are projected to world frame and floor points (|z| &lt; 0.1 m) are painted onto a co-registered texture grid.
+</p>
+
+<h4>First-scan sanity check</h4>
+<div class="img-grid-2">
+  <div>
+    <img src="Dataset_20_First-Scan_Occupancy.png" alt="Dataset 20 first scan">
+    <p class="note">Dataset 20: first-scan occupancy map</p>
+  </div>
+  <div>
+    <img src="Dataset_21_First-Scan_Occupancy.png" alt="Dataset 21 first scan">
+    <p class="note">Dataset 21: first-scan occupancy map</p>
+  </div>
+</div>
+
+<h4>Dataset 20: ICP map progression and final maps</h4>
+<div class="img-grid-4">
+  <div>
+    <img src="Dataset_20_ICP_Occupancy_24pct.png" alt="DS20 ICP 24%">
+    <p class="note">24%</p>
+  </div>
+  <div>
+    <img src="Dataset_20_ICP_Occupancy_50pct.png" alt="DS20 ICP 50%">
+    <p class="note">50%</p>
+  </div>
+  <div>
+    <img src="Dataset_20_ICP_Occupancy_74pct.png" alt="DS20 ICP 74%">
+    <p class="note">74%</p>
+  </div>
+  <div>
+    <img src="Dataset_20_ICP_Occupancy_100pct.png" alt="DS20 ICP 100%">
+    <p class="note">100%</p>
+  </div>
+</div>
+
+<div class="img-grid-2">
+  <div>
+    <img src="Dataset_20_Occupancy_Map.png" alt="Dataset 20 ICP occupancy">
+    <p class="note">Dataset 20: ICP occupancy map</p>
+  </div>
+  <div>
+    <img src="Dataset_20_Texture_Map.png" alt="Dataset 20 texture">
+    <p class="note">Dataset 20: ICP texture map</p>
+  </div>
+</div>
+
+<h4>Dataset 21: ICP map progression and final maps</h4>
+<div class="img-grid-4">
+  <div>
+    <img src="Dataset_21_ICP_Occupancy_24pct.png" alt="DS21 ICP 24%">
+    <p class="note">24%</p>
+  </div>
+  <div>
+    <img src="Dataset_21_ICP_Occupancy_49pct.png" alt="DS21 ICP 49%">
+    <p class="note">49%</p>
+  </div>
+  <div>
+    <img src="Dataset_21_ICP_Occupancy_74pct.png" alt="DS21 ICP 74%">
+    <p class="note">74%</p>
+  </div>
+  <div>
+    <img src="Dataset_21_ICP_Occupancy_100pct.png" alt="DS21 ICP 100%">
+    <p class="note">100%</p>
+  </div>
+</div>
+
+<div class="img-grid-2">
+  <div>
+    <img src="Dataset_21_Occupancy_Map.png" alt="Dataset 21 ICP occupancy">
+    <p class="note">Dataset 21: ICP occupancy map</p>
+  </div>
+  <div>
+    <img src="Dataset_21_Texture_Map.png" alt="Dataset 21 texture">
+    <p class="note">Dataset 21: ICP texture map</p>
+  </div>
+</div>
+
+<h3>Part 4: GTSAM Pose Graph Optimization</h3>
+<p>
+  A GTSAM factor graph is built over ICP poses with odometry (between) factors, fixed-interval loop closure factors every 10 poses, and proximity-based loop closures detected via KD-tree. All loop closure candidates pass an MSE consistency check before being added. Loop closure factors use a Huber robust kernel to limit outlier influence.
+</p>
+<p>
+  Dataset 20 had one proximity-based loop closure (MSE 0.013), providing a global anchoring constraint and yielding a 63.7% error reduction. Dataset 21 had no proximity loop closures; optimization relied entirely on fixed-interval smoothing, achieving a 54.3% reduction.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th><th>Dataset 20</th><th>Dataset 21</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Total poses</td><td>4,962</td><td>4,785</td></tr>
+    <tr><td>Odometry factors</td><td>4,961</td><td>4,784</td></tr>
+    <tr><td>Fixed-interval closures</td><td>496</td><td>478</td></tr>
+    <tr><td>Proximity-based closures</td><td>1</td><td>0</td></tr>
+    <tr><td>Initial graph error</td><td>5.724</td><td>9.149</td></tr>
+    <tr><td>Final graph error</td><td>2.080</td><td>4.176</td></tr>
+    <tr><td>Error reduction</td><td>63.7%</td><td>54.3%</td></tr>
+  </tbody>
+</table>
+
+<h4>Dataset 20: GTSAM trajectory and maps</h4>
+<div class="img-grid-2">
+  <div>
+    <img src="Dataset_20_GTSAM_Trajectory.png" alt="Dataset 20 GTSAM trajectory">
+    <p class="note">ICP (blue) vs. GTSAM (red) trajectory</p>
+  </div>
+  <div>
+    <img src="Dataset_20_GTSAM_Occupancy_Map.png" alt="Dataset 20 GTSAM occupancy">
+    <p class="note">GTSAM occupancy map with trajectory</p>
+  </div>
+</div>
+
+<div class="img-grid-4">
+  <div>
+    <img src="Dataset_20_GTSAM_Occupancy_24pct.png" alt="DS20 GTSAM 24%">
+    <p class="note">24%</p>
+  </div>
+  <div>
+    <img src="Dataset_20_GTSAM_Occupancy_50pct.png" alt="DS20 GTSAM 50%">
+    <p class="note">50%</p>
+  </div>
+  <div>
+    <img src="Dataset_20_GTSAM_Occupancy_74pct.png" alt="DS20 GTSAM 74%">
+    <p class="note">74%</p>
+  </div>
+  <div>
+    <img src="Dataset_20_GTSAM_Occupancy_100pct.png" alt="DS20 GTSAM 100%">
+    <p class="note">100%</p>
+  </div>
+</div>
+
+<div class="img-grid-2">
+  <div>
+    <img src="Dataset_20_GTSAM_Occupancy_Map.png" alt="Dataset 20 GTSAM final occupancy">
+    <p class="note">Dataset 20: GTSAM occupancy map</p>
+  </div>
+  <div>
+    <img src="Dataset_20_GTSAM_Texture_Map.png" alt="Dataset 20 GTSAM texture">
+    <p class="note">Dataset 20: GTSAM texture map</p>
+  </div>
+</div>
+
+<h4>Dataset 21: GTSAM trajectory and maps</h4>
+<div class="img-grid-2">
+  <div>
+    <img src="Dataset_21_GTSAM_Trajectory.png" alt="Dataset 21 GTSAM trajectory">
+    <p class="note">ICP (blue) vs. GTSAM (red) trajectory</p>
+  </div>
+  <div>
+    <img src="Dataset_21_GTSAM_Occupancy_Map.png" alt="Dataset 21 GTSAM occupancy">
+    <p class="note">GTSAM occupancy map with trajectory</p>
+  </div>
+</div>
+
+<div class="img-grid-4">
+  <div>
+    <img src="Dataset_21_GTSAM_Occupancy_24pct.png" alt="DS21 GTSAM 24%">
+    <p class="note">24%</p>
+  </div>
+  <div>
+    <img src="Dataset_21_GTSAM_Occupancy_49pct.png" alt="DS21 GTSAM 49%">
+    <p class="note">49%</p>
+  </div>
+  <div>
+    <img src="Dataset_21_GTSAM_Occupancy_74pct.png" alt="DS21 GTSAM 74%">
+    <p class="note">74%</p>
+  </div>
+  <div>
+    <img src="Dataset_21_GTSAM_Occupancy_100pct.png" alt="DS21 GTSAM 100%">
+    <p class="note">100%</p>
+  </div>
+</div>
+
+<div class="img-grid-2">
+  <div>
+    <img src="Dataset_21_GTSAM_Occupancy_Map.png" alt="Dataset 21 GTSAM final occupancy">
+    <p class="note">Dataset 21: GTSAM occupancy map</p>
+  </div>
+  <div>
+    <img src="Dataset_21_GTSAM_Texture_Map.png" alt="Dataset 21 GTSAM texture">
+    <p class="note">Dataset 21: GTSAM texture map</p>
+  </div>
+</div>
+<hr>
+
+<p><a href="/">← Back to Portfolio</a></p>
+
+</body>
+</html>

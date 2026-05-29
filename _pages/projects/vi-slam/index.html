@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visual-Inertial SLAM via EKF on SE(3)</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 30px 100px 30px;
+    }
+    h1 { font-size: 2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 1.5rem; }
+    p { margin: 0.8em 0; }
+    a { color: #4183C4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid #eee; margin: 2rem 0; }
+    img { max-width: 100%; display: block; margin: 1rem auto; border: 1px solid #eee; }
+    strong { color: #222; }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.4rem 0; }
+    .venue { color: #555; font-style: italic; margin-bottom: 1rem; }
+    .img-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 1rem 0;
+    }
+    .img-grid-2 img { margin: 0; width: 100%; }
+    .note {
+      font-size: 13px;
+      color: #666;
+      margin-top: 0.3rem;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 1rem 0;
+    }
+    th {
+      background: #f6f8fa;
+      border: 1px solid #e1e4e8;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    td {
+      border: 1px solid #e1e4e8;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    td.param { text-align: left; }
+  </style>
+</head>
+<body>
+
+<h1>Visual-Inertial SLAM via EKF on SE(3)</h1>
+<p class="venue">UC San Diego, ECE 276A: Sensing &amp; Estimation in Robotics · Winter Quarter 2026</p>
+<p>
+  <a href="https://github.com/acompalas/ECE276A-PR3">Code</a>
+  &nbsp;|&nbsp;
+  <a href="/docs/ECE_276A_PR3.pdf">Report</a>
+</p>
+<hr>
+
+<h2>Overview</h2>
+<p>
+  This project implements visual-inertial SLAM using an Extended Kalman Filter operating on the Lie group SE(3). The system fuses high-frequency IMU velocity measurements with stereo camera observations of point landmarks to jointly estimate the robot trajectory and a sparse 3D map. The pipeline is decomposed into four tasks: IMU dead reckoning, feature detection and tracking (extra credit), landmark mapping with a fixed trajectory, and full joint pose-landmark SLAM.
+</p>
+<p>
+  Data collected by Clearpath Jackal robots navigating MIT's campus, provided by Prof. Nikolay Atanasov as part of ECE 276A. Available at the
+  <a href="https://ucsdcloud-my.sharepoint.com/:f:/g/personal/natanasov_ucsd_edu/IgBSgfx_0X7vRrgN_MLnAv1BARpJxAYkOglXAGIA229Ln-E">course SharePoint</a>.
+</p>
+<hr>
+
+<h2>Task 1: IMU Dead Reckoning</h2>
+<p>
+  The IMU pose is propagated using exact SE(3) kinematics with variable timesteps computed directly from UNIX timestamps. Covariance is propagated via the adjoint of the body-frame twist. Process noise was tuned down to &sigma;<sup>2</sup> = 10<sup>-6</sup> from the TA-suggested 0.1, treating the IMU as near-perfect and reserving camera observations for small drift corrections only.
+</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:1rem 0;">
+  <div>
+    <img src="task1_dataset00.png" alt="Task 1 dataset00" style="margin:0;width:100%;">
+    <p class="note">Dataset00: curved path (~150 m)</p>
+  </div>
+  <div>
+    <img src="task1_dataset01.png" alt="Task 1 dataset01" style="margin:0;width:100%;">
+    <p class="note">Dataset01: longer arc</p>
+  </div>
+  <div>
+    <img src="task1_dataset02.png" alt="Task 1 dataset02" style="margin:0;width:100%;">
+    <p class="note">Dataset02: L-shaped path</p>
+  </div>
+</div>
+<hr>
+
+<h2>Task 2: Feature Detection and Tracking (Extra Credit)</h2>
+<p>
+  Dataset02 provides no pre-computed features, so a full stereo feature tracker was implemented from scratch. Shi-Tomasi corners are detected every 5 frames in the left image. Temporal tracks are maintained via Lucas-Kanade pyramidal optical flow. Stereo correspondences are found by running optical flow from left to right image, filtered by positive disparity and an epipolar constraint (|v<sub>L</sub> - v<sub>R</sub>| &le; 2 px). A total of 19,559 unique feature tracks were computed across 6,393 timesteps.
+</p>
+
+<figure>
+  <img src="task2_dataset02.png" alt="Task 2 feature tracking">
+  <p class="note">Top: stereo matches at t=15 (blue = left camera, red = right camera). Bottom: temporal tracks from t=15 (blue) to t=115 (red).</p>
+</figure>
+<hr>
+
+<h2>Task 3: Landmark Mapping</h2>
+<p>
+  With the IMU trajectory fixed from Task 1, landmark positions are estimated using per-landmark 3x3 EKF updates from stereo observations. Each landmark is initialized via stereo triangulation at its first valid observation. Three robustness filters were added beyond the lecture formulation: a minimum disparity gate (2 px) to avoid near-zero-depth instability, a maximum depth cap (50 m) to reject far noisy landmarks, and an innovation gate (50 px) to skip bad observations.
+</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:1rem 0;">
+  <div>
+    <img src="task3_dataset00.png" alt="Task 3 dataset00" style="margin:0;width:100%;">
+    <p class="note">Dataset00: landmark map (black dots) along IMU trajectory (red)</p>
+  </div>
+  <div>
+    <img src="task3_dataset01.png" alt="Task 3 dataset01" style="margin:0;width:100%;">
+    <p class="note">Dataset01: landmark map along IMU trajectory</p>
+  </div>
+  <div>
+    <img src="task3_dataset02.png" alt="Task 3 dataset02" style="margin:0;width:100%;">
+    <p class="note">Dataset02: landmark map along IMU trajectory</p>
+  </div>
+</div>
+<hr>
+
+<h2>Task 4: Visual-Inertial SLAM</h2>
+<p>
+  The full VI-SLAM system combines the IMU prediction step with a joint pose-landmark EKF update. The joint covariance is stored as a SciPy sparse matrix. The Joseph stabilized covariance update replaces the standard (I - KH)&Sigma; form, which is necessary for sustained numerical stability as state dimension grows. New landmarks are initialized on-the-fly from the corrected pose.
+</p>
+<p>
+  Two additional robustness filters were added for Task 4: a tighter innovation gate (20 px, vs 50 px in Task 3) since a bad observation now directly corrupts the pose via the cross-covariance block, and a pose correction gate that skips the entire update if ||&delta;&xi;|| > 0.3 to guard against degenerate linearizations.
+</p>
+<p>
+  In both datasets the SLAM trajectory (blue) visibly corrects the IMU-only estimate (red). Dataset00 shows reduced y-bias; dataset01 shows a more compact arc consistent with the IMU overestimating curvature.
+</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:1rem 0;">
+  <div>
+    <img src="task4_dataset00.png" alt="Task 4 dataset00" style="margin:0;width:100%;">
+    <p class="note">Dataset00: IMU-only (red) vs. SLAM-corrected (blue) with landmarks (gray)</p>
+  </div>
+  <div>
+    <img src="task4_dataset01.png" alt="Task 4 dataset01" style="margin:0;width:100%;">
+    <p class="note">Dataset01: SLAM correction pulls the arc inward relative to dead reckoning</p>
+  </div>
+  <div>
+    <img src="task4_dataset02.png" alt="Task 4 dataset02" style="margin:0;width:100%;">
+    <p class="note">Dataset02: SLAM trajectory follows the L-shape more precisely</p>
+  </div>
+</div>
+<hr>
+
+<h2>Key Parameters</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th><th>Value</th><th>Task</th><th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="param">Process noise &sigma;<sup>2</sup></td><td>10<sup>-6</sup></td><td>1, 4</td><td>TA start, tuned</td></tr>
+    <tr><td class="param">Obs. noise Task 3 (&sigma;<sup>2</sup><sub>V</sub>)</td><td>4.0 px<sup>2</sup></td><td>3</td><td>TA start, tuned</td></tr>
+    <tr><td class="param">Obs. noise Task 4 (&sigma;<sup>2</sup><sub>V</sub>)</td><td>2.0 px<sup>2</sup></td><td>4</td><td>TA start, tuned</td></tr>
+    <tr><td class="param">Min. disparity gate</td><td>2.0 px</td><td>3, 4</td><td>Self-introduced</td></tr>
+    <tr><td class="param">Max. depth gate</td><td>50.0 m</td><td>3, 4</td><td>Self-introduced</td></tr>
+    <tr><td class="param">Innovation gate Task 3</td><td>50.0 px</td><td>3</td><td>Self-introduced</td></tr>
+    <tr><td class="param">Innovation gate Task 4</td><td>20.0 px</td><td>4</td><td>Self-introduced</td></tr>
+    <tr><td class="param">Pose correction gate (&gamma;<sub>&xi;</sub>)</td><td>0.3</td><td>4</td><td>Self-introduced</td></tr>
+  </tbody>
+</table>
+<hr>
+
+<p><a href="/">&larr; Back to Portfolio</a></p>
+
+</body>
+</html>

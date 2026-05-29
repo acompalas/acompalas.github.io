@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Programming for Door &amp; Key Navigation</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 30px 100px 30px;
+    }
+    h1 { font-size: 2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 1.5rem; }
+    p { margin: 0.8em 0; }
+    a { color: #4183C4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid #eee; margin: 2rem 0; }
+    img { max-width: 100%; display: block; margin: 1rem auto; border: 1px solid #eee; }
+    strong { color: #222; }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.4rem 0; }
+    .venue { color: #555; font-style: italic; margin-bottom: 1rem; }
+    .note { font-size: 13px; color: #666; margin-top: 0.3rem; text-align: center; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 1rem 0;
+    }
+    th {
+      background: #f6f8fa;
+      border: 1px solid #e1e4e8;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    td {
+      border: 1px solid #e1e4e8;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    td.env { text-align: left; }
+    .gif-grid {
+      display: grid;
+      gap: 10px;
+      margin: 1rem 0;
+    }
+    .gif-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .gif-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .gif-grid-5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+    .gif-grid img { margin: 0; width: 100%; border: 1px solid #eee; }
+    .traj-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      margin: 1rem 0;
+    }
+    .traj-grid img { margin: 0; width: 100%; border: 1px solid #eee; }
+  </style>
+</head>
+<body>
+
+<h1>Dynamic Programming for Door &amp; Key Navigation</h1>
+<p class="venue">UC San Diego, ECE 276B: Planning &amp; Learning in Robotics · Spring Quarter 2026</p>
+<p>
+  <a href="https://github.com/acompalas/ECE276B-PR1">Code</a>
+  &nbsp;|&nbsp;
+  <a href="/docs/ECE_276B_PR1.pdf">Report</a>
+</p>
+<hr>
+
+<h2>Overview</h2>
+<p>
+  This project solves the Door &amp; Key grid-world navigation problem using Dynamic Programming. An agent (red triangle) must reach a goal (green square) at minimum cost, potentially picking up a key and unlocking a door along the way. The problem is formulated as a deterministic, fully observable, first-exit MDP and solved via value iteration.
+</p>
+<p>
+  Two scenarios are addressed. Part A computes a separate optimal policy for each of seven known environments. Part B computes a single unified policy covering all 36 random 10x10 environment configurations by augmenting the state space with discrete key and goal location indices.
+</p>
+<hr>
+
+<h2>MDP Formulation</h2>
+<p>
+  The state encodes the agent's grid position, facing direction (right/down/left/up), whether it is carrying the key, and the open/locked status of each door. For the random-map setting the state is extended with indices for the active key location and goal location, giving 28,800 total states across the 10x10 grid.
+</p>
+<p>
+  The five actions and their costs are: Turn Left/Right (cost 1), Move Forward (cost 3), Pick Up Key (cost 2), Unlock Door (cost 5). Invalid actions are no-op transitions that still incur cost, so the DP naturally avoids them. Value iteration runs until the maximum change in the cost-to-go falls below 10<sup>-6</sup>.
+</p>
+<hr>
+
+<h2>Part A: Known Maps</h2>
+<p>
+  A separate policy is computed for each of the seven environments. The <em>direct</em> environments have the lowest costs because the agent can reach the goal without a key. The <em>shortcut</em> environments use the locked door for a shorter route despite the unlock cost. The <em>normal</em> environments require the longest key-retrieval detour.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Environment</th><th>Optimal Cost</th><th>Steps</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="env">doorkey-5x5-normal</td><td>28</td><td>13</td></tr>
+    <tr><td class="env">doorkey-6x6-normal</td><td>33</td><td>14</td></tr>
+    <tr><td class="env">doorkey-6x6-direct</td><td>13</td><td>5</td></tr>
+    <tr><td class="env">doorkey-6x6-shortcut</td><td>15</td><td>6</td></tr>
+    <tr><td class="env">doorkey-8x8-normal</td><td>54</td><td>21</td></tr>
+    <tr><td class="env">doorkey-8x8-direct</td><td>17</td><td>7</td></tr>
+    <tr><td class="env">doorkey-8x8-shortcut</td><td>19</td><td>8</td></tr>
+  </tbody>
+</table>
+
+<div class="gif-grid gif-grid-3">
+  <div>
+    <img src="gif/doorkey-5x5-normal.gif" alt="5x5 normal">
+    <p class="note">5x5 normal (cost 28)</p>
+  </div>
+  <div>
+    <img src="gif/doorkey-6x6-normal.gif" alt="6x6 normal">
+    <p class="note">6x6 normal (cost 33)</p>
+  </div>
+  <div>
+    <img src="gif/doorkey-6x6-direct.gif" alt="6x6 direct">
+    <p class="note">6x6 direct (cost 13)</p>
+  </div>
+  <div>
+    <img src="gif/doorkey-6x6-shortcut.gif" alt="6x6 shortcut">
+    <p class="note">6x6 shortcut (cost 15)</p>
+  </div>
+  <div>
+    <img src="gif/doorkey-8x8-normal.gif" alt="8x8 normal">
+    <p class="note">8x8 normal (cost 54)</p>
+  </div>
+  <div>
+    <img src="gif/doorkey-8x8-direct.gif" alt="8x8 direct">
+    <p class="note">8x8 direct (cost 17)</p>
+  </div>
+</div>
+<div style="max-width:260px;margin:0 auto 1rem;">
+  <img src="gif/doorkey-8x8-shortcut.gif" alt="8x8 shortcut" style="width:100%;">
+  <p class="note">8x8 shortcut (cost 19)</p>
+</div>
+<hr>
+
+<h2>Part B: Random Maps</h2>
+<p>
+  A single unified policy is computed over the augmented 28,800-state space and applied to all 36 random 10x10 environments. Value iteration converged in 25 iterations. All 36 environments are solved: minimum cost 14 (direct path, no key needed), maximum cost 53 (long key-retrieval route with door unlock), mean cost 30.1.
+</p>
+
+<h3>Sample GIFs</h3>
+<div class="gif-grid gif-grid-5">
+  <div>
+    <img src="gif/DoorKey-10x10-1.gif" alt="env 1">
+    <p class="note">Env 1 (cost 29)</p>
+  </div>
+  <div>
+    <img src="gif/DoorKey-10x10-4.gif" alt="env 4">
+    <p class="note">Env 4 (cost 50)</p>
+  </div>
+  <div>
+    <img src="gif/DoorKey-10x10-9.gif" alt="env 9">
+    <p class="note">Env 9 (cost 14)</p>
+  </div>
+  <div>
+    <img src="gif/DoorKey-10x10-12.gif" alt="env 12">
+    <p class="note">Env 12 (cost 53)</p>
+  </div>
+  <div>
+    <img src="gif/DoorKey-10x10-21.gif" alt="env 21">
+    <p class="note">Env 21 (cost 14)</p>
+  </div>
+</div>
+
+<h3>All 36 Trajectories</h3>
+<p>Optimal paths for all 36 random environments, shown as static trajectory overlays.</p>
+
+<div class="traj-grid">
+  <img src="trajectories/DoorKey-10x10-1_trajectory.png" alt="1">
+  <img src="trajectories/DoorKey-10x10-2_trajectory.png" alt="2">
+  <img src="trajectories/DoorKey-10x10-3_trajectory.png" alt="3">
+  <img src="trajectories/DoorKey-10x10-4_trajectory.png" alt="4">
+  <img src="trajectories/DoorKey-10x10-5_trajectory.png" alt="5">
+  <img src="trajectories/DoorKey-10x10-6_trajectory.png" alt="6">
+  <img src="trajectories/DoorKey-10x10-7_trajectory.png" alt="7">
+  <img src="trajectories/DoorKey-10x10-8_trajectory.png" alt="8">
+  <img src="trajectories/DoorKey-10x10-9_trajectory.png" alt="9">
+  <img src="trajectories/DoorKey-10x10-10_trajectory.png" alt="10">
+  <img src="trajectories/DoorKey-10x10-11_trajectory.png" alt="11">
+  <img src="trajectories/DoorKey-10x10-12_trajectory.png" alt="12">
+  <img src="trajectories/DoorKey-10x10-13_trajectory.png" alt="13">
+  <img src="trajectories/DoorKey-10x10-14_trajectory.png" alt="14">
+  <img src="trajectories/DoorKey-10x10-15_trajectory.png" alt="15">
+  <img src="trajectories/DoorKey-10x10-16_trajectory.png" alt="16">
+  <img src="trajectories/DoorKey-10x10-17_trajectory.png" alt="17">
+  <img src="trajectories/DoorKey-10x10-18_trajectory.png" alt="18">
+  <img src="trajectories/DoorKey-10x10-19_trajectory.png" alt="19">
+  <img src="trajectories/DoorKey-10x10-20_trajectory.png" alt="20">
+  <img src="trajectories/DoorKey-10x10-21_trajectory.png" alt="21">
+  <img src="trajectories/DoorKey-10x10-22_trajectory.png" alt="22">
+  <img src="trajectories/DoorKey-10x10-23_trajectory.png" alt="23">
+  <img src="trajectories/DoorKey-10x10-24_trajectory.png" alt="24">
+  <img src="trajectories/DoorKey-10x10-25_trajectory.png" alt="25">
+  <img src="trajectories/DoorKey-10x10-26_trajectory.png" alt="26">
+  <img src="trajectories/DoorKey-10x10-27_trajectory.png" alt="27">
+  <img src="trajectories/DoorKey-10x10-28_trajectory.png" alt="28">
+  <img src="trajectories/DoorKey-10x10-29_trajectory.png" alt="29">
+  <img src="trajectories/DoorKey-10x10-30_trajectory.png" alt="30">
+  <img src="trajectories/DoorKey-10x10-31_trajectory.png" alt="31">
+  <img src="trajectories/DoorKey-10x10-32_trajectory.png" alt="32">
+  <img src="trajectories/DoorKey-10x10-33_trajectory.png" alt="33">
+  <img src="trajectories/DoorKey-10x10-34_trajectory.png" alt="34">
+  <img src="trajectories/DoorKey-10x10-35_trajectory.png" alt="35">
+  <img src="trajectories/DoorKey-10x10-36_trajectory.png" alt="36">
+</div>
+<hr>
+
+<p><a href="/">&larr; Back to Portfolio</a></p>
+
+</body>
+</html>

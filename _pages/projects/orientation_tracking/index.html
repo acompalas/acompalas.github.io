@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orientation Tracking and Panoramic Image Stitching</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 30px 100px 30px;
+    }
+    h1 { font-size: 2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 1.5rem; }
+    p { margin: 0.8em 0; }
+    a { color: #4183C4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid #eee; margin: 2rem 0; }
+    img { max-width: 100%; display: block; margin: 1rem auto; border: 1px solid #eee; }
+    figcaption { text-align: center; font-size: 14px; color: #666; margin-top: 0.5rem; margin-bottom: 1rem; }
+    strong { color: #222; }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.4rem 0; }
+    .venue { color: #555; font-style: italic; margin-bottom: 1rem; }
+    .img-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin: 1rem 0;
+    }
+    .img-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 1rem 0;
+    }
+    .img-grid-3 img,
+    .img-grid-2 img {
+      margin: 0;
+      width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 1rem 0;
+    }
+    th {
+      background: #f6f8fa;
+      border: 1px solid #e1e4e8;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    td {
+      border: 1px solid #e1e4e8;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    .note {
+      font-size: 13px;
+      color: #666;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Orientation Tracking and Panoramic Image Stitching</h1>
+<p class="venue">UC San Diego, ECE 276A: Sensing &amp; Estimation in Robotics · Winter Quarter 2026</p>
+<p>
+  <a href="https://github.com/acompalas/ECE276A-PR1">Code</a>
+  &nbsp;|&nbsp;
+  <a href="/docs/ECE_276A_PR1.pdf">Report</a>
+</p>
+<hr>
+
+<h2>Overview</h2>
+<p>
+  This project tracks the 3D orientation of a rotating body using IMU data alone, then uses those orientation estimates to stitch a sequence of narrow camera frames into wide panoramic images. The core algorithm is projected gradient descent over a trajectory of unit quaternions, jointly optimizing a motion model (gyroscope kinematics) and an observation model (accelerometer gravity constraint).
+</p>
+<p>
+  The method is evaluated on 9 training sequences and 2 test sequences, each containing synchronized IMU, camera, and (for training) VICON motion-capture ground truth data.
+  Dataset provided by Prof. Nikolay Atanasov as part of ECE 276A;
+  <a href="https://ucsdcloud-my.sharepoint.com/:f:/g/personal/natanasov_ucsd_edu/IgBek3pBUhg4Rr-TP7oMZXikARvskUMNOCnORDml2BNz878?e=e3WLBo">training &amp; test data</a>.
+</p>
+<hr>
+
+<h2>Approach</h2>
+
+<h3>IMU Calibration</h3>
+<p>
+  Each dataset begins with a static period where the body is at rest. Sensor biases are estimated by averaging gyroscope and accelerometer readings during this window; the gyroscope should read zero and the accelerometer should read 1g upward. After subtracting these biases, gyroscope-only integration already tracks roll and pitch reasonably well, as shown below.
+</p>
+
+<div class="img-grid-3">
+  <img src="plots/imu_vs_vicon_1.png" alt="IMU vs VICON ds1">
+  <img src="plots/imu_vs_vicon_2.png" alt="IMU vs VICON ds2">
+  <img src="plots/imu_vs_vicon_3.png" alt="IMU vs VICON ds3">
+</div>
+<p class="note" style="text-align:center;">Gyro-only integration vs. VICON ground truth (datasets 1–3). Roll and pitch track well; yaw drifts as expected.</p>
+
+<h3>Projected Gradient Descent</h3>
+<p>
+  The full optimization minimizes a cost over the quaternion trajectory q<sub>1:T</sub> with two terms: a motion model error penalizing deviation from gyroscope-predicted orientation, and an observation model error penalizing mismatch with the measured gravity direction. After each gradient step the quaternions are projected back to unit norm. The trajectory is initialized via gyroscope integration, which dramatically improves convergence.
+</p>
+<p>
+  After optimization, roll and pitch agree closely with VICON ground truth (typically within ±0.1 rad). Yaw is unobservable by the accelerometer and exhibits some drift, an expected fundamental limitation.
+</p>
+
+<div class="img-grid-3">
+  <img src="plots/optimized_ds1.png" alt="Optimized ds1">
+  <img src="plots/optimized_ds2.png" alt="Optimized ds2">
+  <img src="plots/optimized_ds3.png" alt="Optimized ds3">
+</div>
+<p class="note" style="text-align:center;">Optimized orientation (gyro + accelerometer) vs. VICON ground truth (datasets 1–3).</p>
+
+<div class="img-grid-3">
+  <img src="plots/optimized_ds7.png" alt="Optimized ds7">
+  <img src="plots/optimized_ds8.png" alt="Optimized ds8">
+  <img src="plots/optimized_ds9.png" alt="Optimized ds9">
+</div>
+<p class="note" style="text-align:center;">Optimized orientation vs. VICON ground truth (datasets 7–9).</p>
+
+<h3>Panorama Stitching</h3>
+<p>
+  Each camera frame is back-projected through the estimated orientation into a cylindrical world coordinate panorama. For each pixel, the viewing ray is transformed from camera frame → IMU frame → world frame, then mapped to azimuth and elevation coordinates in the output image. Frames are stitched by simple overwriting in chronological order.
+</p>
+<hr>
+
+<h2>Convergence</h2>
+<p>All 11 datasets (9 training, 2 test) converged to a final cost below 1.5, representing reductions of 1–3 orders of magnitude from initial cost. Most training sets converged before the 5000-iteration limit.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Dataset</th><th>Split</th><th>Samples</th><th>Converged At</th><th>Initial Cost</th><th>Final Cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>Train</td><td>5645</td><td>2057</td><td>161.4</td><td>0.434</td></tr>
+    <tr><td>2</td><td>Train</td><td>4698</td><td>5000*</td><td>281.4</td><td>0.561</td></tr>
+    <tr><td>3</td><td>Train</td><td>3404</td><td>5000*</td><td>11.2</td><td>1.187</td></tr>
+    <tr><td>4</td><td>Train</td><td>3156</td><td>5000*</td><td>142.4</td><td>1.089</td></tr>
+    <tr><td>5</td><td>Train</td><td>3210</td><td>4811</td><td>271.1</td><td>1.242</td></tr>
+    <tr><td>6</td><td>Train</td><td>3211</td><td>2776</td><td>84.8</td><td>0.836</td></tr>
+    <tr><td>7</td><td>Train</td><td>3577</td><td>1978</td><td>230.7</td><td>1.466</td></tr>
+    <tr><td>8</td><td>Train</td><td>3501</td><td>2717</td><td>75.6</td><td>0.401</td></tr>
+    <tr><td>9</td><td>Train</td><td>2931</td><td>4117</td><td>301.7</td><td>0.328</td></tr>
+    <tr><td>10</td><td>Test</td><td>3078</td><td>3576</td><td>37.8</td><td>0.315</td></tr>
+    <tr><td>11</td><td>Test</td><td>5441</td><td>712</td><td>11.8</td><td>1.182</td></tr>
+  </tbody>
+</table>
+<p class="note">* Reached 5000-iteration limit; final cost change was &lt;10⁻⁴, indicating near-convergence.</p>
+<hr>
+
+<h2>Training Panoramas</h2>
+<p>
+  Panoramas from the four camera-equipped training datasets show clear room structure with correct vertical orientation. Black regions correspond to directions not observed during the rotation sequence. Each is shown alongside its VICON-based reference.
+</p>
+
+<div class="img-grid-2">
+  <div>
+    <img src="panoramas/panorama_ds1_optimized.png" alt="Panorama ds1 optimized">
+    <p class="note" style="text-align:center;">Dataset 1 (optimized)</p>
+  </div>
+  <div>
+    <img src="panoramas/panorama_ds1_vicon.png" alt="Panorama ds1 VICON">
+    <p class="note" style="text-align:center;">Dataset 1 (VICON ground truth)</p>
+  </div>
+  <div>
+    <img src="panoramas/panorama_ds2_optimized.png" alt="Panorama ds2 optimized">
+    <p class="note" style="text-align:center;">Dataset 2 (optimized)</p>
+  </div>
+  <div>
+    <img src="panoramas/panorama_ds2_vicon.png" alt="Panorama ds2 VICON">
+    <p class="note" style="text-align:center;">Dataset 2 (VICON ground truth)</p>
+  </div>
+  <div>
+    <img src="panoramas/panorama_ds8_optimized.png" alt="Panorama ds8 optimized">
+    <p class="note" style="text-align:center;">Dataset 8 (optimized)</p>
+  </div>
+  <div>
+    <img src="panoramas/panorama_ds8_vicon.png" alt="Panorama ds8 VICON">
+    <p class="note" style="text-align:center;">Dataset 8 (VICON ground truth)</p>
+  </div>
+  <div>
+    <img src="panoramas/panorama_ds9_optimized.png" alt="Panorama ds9 optimized">
+    <p class="note" style="text-align:center;">Dataset 9 (optimized)</p>
+  </div>
+  <div>
+    <img src="panoramas/panorama_ds9_vicon.png" alt="Panorama ds9 VICON">
+    <p class="note" style="text-align:center;">Dataset 9 (VICON ground truth)</p>
+  </div>
+</div>
+<p>
+  Optimized panoramas closely match the VICON-based reference. The main visible difference is a slight horizontal shift in some datasets (e.g. dataset 2), caused by yaw drift, consistent with the known unobservability of yaw from accelerometer data alone.
+</p>
+<hr>
+
+<h2>Test Panoramas</h2>
+<p>
+  No ground truth is available for the test datasets. Both sequences converged cleanly and produce recognizable panoramas.
+</p>
+
+<div class="img-grid-2">
+  <div>
+    <img src="plots/optimized_ds10.png" alt="Test ds10 orientation">
+    <p class="note" style="text-align:center;">Dataset 10 (estimated orientation)</p>
+  </div>
+  <div>
+    <img src="plots/optimized_ds11.png" alt="Test ds11 orientation">
+    <p class="note" style="text-align:center;">Dataset 11 (estimated orientation)</p>
+  </div>
+  <div>
+    <img src="panoramas/panorama_ds10_optimized.png" alt="Panorama ds10">
+    <p class="note" style="text-align:center;">Dataset 10 (panorama)</p>
+  </div>
+  <div>
+    <img src="panoramas/panorama_ds11_optimized.png" alt="Panorama ds11">
+    <p class="note" style="text-align:center;">Dataset 11 (panorama)</p>
+  </div>
+</div>
+<hr>
+
+<p><a href="/">← Back to Portfolio</a></p>
+
+</body>
+</html>
