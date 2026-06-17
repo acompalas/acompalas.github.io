@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reproducing ViViDex: Dexterous Manipulation from Human Videos</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 30px 100px 30px;
+    }
+    h1 { font-size: 2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 0.3em; margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 1.5rem; }
+    p { margin: 0.8em 0; }
+    a { color: #4183C4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    hr { border: none; border-top: 1px solid #eee; margin: 2rem 0; }
+    img { max-width: 100%; display: block; margin: 1rem auto; border: 1px solid #eee; }
+    strong { color: #222; }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.4rem 0; }
+    .venue { color: #555; font-style: italic; margin-bottom: 1rem; }
+    .note { font-size: 13px; color: #666; margin-top: 0.3rem; text-align: center; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 1rem 0; }
+    .grid-3 img { margin: 0; width: 100%; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 1rem 0; }
+    .grid-2 img { margin: 0; width: 100%; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 1rem 0;
+    }
+    th { background: #f6f8fa; border: 1px solid #e1e4e8; padding: 6px 10px; text-align: center; }
+    td { border: 1px solid #e1e4e8; padding: 6px 10px; text-align: center; }
+    td.l { text-align: left; }
+    .row-label { font-size: 12px; color: #555; text-align: center; margin: 4px 0 8px 0; }
+  </style>
+</head>
+<body>
+
+<h1>Reproducing ViViDex: Dexterous Manipulation from Human Videos</h1>
+<p class="venue">UC San Diego, ECE 228: Machine Learning for Physical Applications · Spring Quarter 2026</p>
+<p>
+  <a href="https://github.com/acompalas/Reproducing-ViViDex-Learning-Vision-based-Dexterous-Manipulation-from-Human-Videos">Code</a>
+  &nbsp;|&nbsp;
+  <a href="/docs/ECE_228_Final_Project_Report.pdf">Report</a>
+  &nbsp;|&nbsp;
+  <a href="https://arxiv.org/abs/2404.15709">ViViDex Paper</a>
+</p>
+<hr>
+
+<h2>Overview</h2>
+<p>
+  <a href="https://arxiv.org/abs/2404.15709">ViViDex</a> (ICRA 2025) learns vision-based dexterous manipulation from a <em>single</em> human video demonstration. It extracts a reference trajectory from multi-view RGB-D data, trains a state-based policy via trajectory-guided PPO in MuJoCo, then distills it into a vision-based policy via Behaviour Cloning on rendered rollouts.
+</p>
+<p>
+  This project reproduces the first two stages of the pipeline from scratch: reference trajectory extraction from <a href="https://dex-ycb.github.io/">DexYCB</a> and trajectory-guided PPO training on the MuJoCo Adroit hand. ViViDex does not release its retargeting code, so we derive the full camera-to-world coordinate transform from DexYCB calibration data and implement two retargeting variants to study the effect of retargeting quality on downstream training.
+</p>
+
+<hr>
+
+<h2>Pipeline</h2>
+
+<h3>Step 1 -- DexYCB Demonstration</h3>
+<p>
+  DexYCB captures human hand-object interactions from 8 synchronized RGB-D cameras. Human annotators label 2D joint keypoints per view; DexYCB fits the MANO hand model jointly across all 8 views to recover accurate 3D hand trajectories. Each frame stores 21 hand joint positions in camera space, along with object pose as a rotation-translation matrix.
+</p>
+
+<div class="grid-3">
+  <div>
+    <img src="dexycb_init.PNG" alt="DexYCB init">
+    <p class="note">(a) Approach</p>
+  </div>
+  <div>
+    <img src="dexycb_pregrasp.PNG" alt="DexYCB pregrasp">
+    <p class="note">(b) Pregrasp</p>
+  </div>
+  <div>
+    <img src="dexycb_manip.PNG" alt="DexYCB manip">
+    <p class="note">(c) Lift</p>
+  </div>
+</div>
+
+<h3>Step 2 -- MANO Hand Reconstruction</h3>
+<p>
+  We reconstruct the 3D MANO hand mesh per frame using subject-specific shape parameters &beta; and per-frame pose parameters &theta;, then transform all poses from camera space to the simulator world frame via the derived coordinate transform. Object translation and orientation match ViViDex's reference NPZ exactly.
+</p>
+
+<div class="grid-3">
+  <div>
+    <img src="mano_init.PNG" alt="MANO init">
+    <p class="note">(a) MANO approach</p>
+  </div>
+  <div>
+    <img src="mano_pregrasp.PNG" alt="MANO pregrasp">
+    <p class="note">(b) MANO pregrasp</p>
+  </div>
+  <div>
+    <img src="mano_manip.PNG" alt="MANO manip">
+    <p class="note">(c) MANO lift</p>
+  </div>
+</div>
+
+<h3>Step 3 -- Motion Retargeting to Adroit</h3>
+<p>
+  Because MANO and Adroit differ in kinematic structure, we solve a per-frame NLopt optimization matching 6 target body positions (palm + 5 middle phalanges) on the Adroit hand to corresponding human joint positions in world space, with temporal smoothness regularization. We implement two variants:
+</p>
+<ul>
+  <li><strong>Naive:</strong> Position-only matching using DexMV's NaiveOptimizationRetargeting. ViViDex cites this as its retargeting method, but our naive implementation fails to achieve sufficient finger abduction -- the hand approaches with the dorsal side rather than the palm. This suggests ViViDex's pipeline includes additional steps not described in the paper.</li>
+  <li><strong>Chain:</strong> Uses MANO global rotation frames (16x4x4 per frame) to initialize finger joint angles before the NLopt solve, resolving the abduction failure and producing substantially better grasping postures.</li>
+</ul>
+
+<div class="grid-3">
+  <div>
+    <img src="baseline_adroit_init.PNG" alt="Baseline adroit init">
+    <p class="note">(a) Baseline init</p>
+  </div>
+  <div>
+    <img src="baseline_adroit_pregrasp.PNG" alt="Baseline adroit pregrasp">
+    <p class="note">(b) Baseline pregrasp</p>
+  </div>
+  <div>
+    <img src="baseline_adroit_manip.PNG" alt="Baseline adroit manip">
+    <p class="note">(c) Baseline manip</p>
+  </div>
+</div>
+<p class="note" style="margin-bottom:12px">ViViDex reference trajectory (undisclosed pipeline)</p>
+
+<div class="grid-3">
+  <div>
+    <img src="naive_adroit_init.PNG" alt="Naive adroit init">
+    <p class="note">(d) Naive init</p>
+  </div>
+  <div>
+    <img src="naive_adroit_pregrasp.PNG" alt="Naive adroit pregrasp">
+    <p class="note">(e) Naive pregrasp -- insufficient abduction</p>
+  </div>
+  <div>
+    <img src="naive_adroit_manip.PNG" alt="Naive adroit manip">
+    <p class="note">(f) Naive manip</p>
+  </div>
+</div>
+<p class="note" style="margin-bottom:12px">Naive retargeting (position-only NLopt)</p>
+
+<div class="grid-3">
+  <div>
+    <img src="chain_adroit_init.PNG" alt="Chain adroit init">
+    <p class="note">(g) Chain init</p>
+  </div>
+  <div>
+    <img src="chain_adroit_pregrasp.PNG" alt="Chain adroit pregrasp">
+    <p class="note">(h) Chain pregrasp -- improved spread</p>
+  </div>
+  <div>
+    <img src="chain_adroit_manip.PNG" alt="Chain adroit manip">
+    <p class="note">(i) Chain manip</p>
+  </div>
+</div>
+<p class="note" style="margin-bottom:12px">Chain retargeting (MANO global frame initialization)</p>
+
+<hr>
+
+<h2>PPO Training</h2>
+<p>
+  Each retargeted trajectory is used as a reference for trajectory-guided PPO in MuJoCo (Adroit hand, mustard bottle relocate task). The two-phase reward guides the policy through pregrasp hand matching followed by object trajectory tracking with a lift bonus. All runs used 32 parallel environments, approximately 200k gradient updates, and approximately 1.5x10<sup>8</sup> total environment steps on Google Colab (12 CPU cores, NVIDIA L4). MuJoCo is CPU-bound; GPU utilization remained below 1% throughout.
+</p>
+
+<h3>Training Curves (Baseline)</h3>
+<p>
+  The baseline training curve reveals a sharp phase transition around 80-90M total steps (shown as approximately 40-50M on the per-session x-axis due to Colab session resets), where hand success jumps from 0.68 to 0.85 and object success rises from 0.55 to 0.80. Goal success first appears only after this transition.
+</p>
+
+<div class="grid-3">
+  <div>
+    <img src="baseline_goal_success.png" alt="Goal success curve">
+    <p class="note">Goal success</p>
+  </div>
+  <div>
+    <img src="baseline_obj_success.png" alt="Object success curve">
+    <p class="note">Object success</p>
+  </div>
+  <div>
+    <img src="baseline_hand_success.png" alt="Hand success curve">
+    <p class="note">Hand success</p>
+  </div>
+</div>
+
+<h3>Results</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Goal Success</th>
+      <th>Object Success</th>
+      <th>Hand Success</th>
+      <th>Grad. Updates</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="l"><strong>Baseline (ViViDex ref.)</strong></td>
+      <td><strong>0.190</strong></td>
+      <td><strong>0.812</strong></td>
+      <td><strong>0.887</strong></td>
+      <td>197,745</td>
+    </tr>
+    <tr>
+      <td class="l">Chain (ours)</td>
+      <td>0.000</td>
+      <td>0.547</td>
+      <td>0.841</td>
+      <td>198,695</td>
+    </tr>
+    <tr>
+      <td class="l">Naive (ours)</td>
+      <td>0.000</td>
+      <td>0.519</td>
+      <td>0.180</td>
+      <td>222,145</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Policy Rollouts</h3>
+
+<div class="grid-3">
+  <div>
+    <img src="pretrained_init.PNG" alt="Pretrained init">
+    <p class="note">(a) Pretrained init</p>
+  </div>
+  <div>
+    <img src="pretrain_pregrasp.PNG" alt="Pretrained pregrasp">
+    <p class="note">(b) Pretrained pregrasp</p>
+  </div>
+  <div>
+    <img src="pretrain_manip.PNG" alt="Pretrained manip">
+    <p class="note">(c) Pretrained -- successful lift</p>
+  </div>
+</div>
+<p class="note" style="margin-bottom:12px">ViViDex pretrained checkpoint</p>
+
+<div class="grid-3">
+  <div>
+    <img src="baseline_ppo_init.PNG" alt="Baseline PPO init">
+    <p class="note">(d) Baseline init</p>
+  </div>
+  <div>
+    <img src="baseline_ppo_pregrasp.PNG" alt="Baseline PPO pregrasp">
+    <p class="note">(e) Baseline pregrasp</p>
+  </div>
+  <div>
+    <img src="baseline_ppo_manip.PNG" alt="Baseline PPO manip">
+    <p class="note">(f) Baseline -- partial lift</p>
+  </div>
+</div>
+<p class="note" style="margin-bottom:12px">Our baseline policy (ViViDex reference trajectory, trained from scratch)</p>
+
+<div class="grid-3">
+  <div>
+    <img src="chain_ppo_init.PNG" alt="Chain PPO init">
+    <p class="note">(g) Chain init</p>
+  </div>
+  <div>
+    <img src="chain_ppo_pregrasp.PNG" alt="Chain PPO pregrasp">
+    <p class="note">(h) Chain pregrasp</p>
+  </div>
+  <div>
+    <img src="chain_ppo_manip.PNG" alt="Chain PPO manip">
+    <p class="note">(i) Chain -- contact but no lift</p>
+  </div>
+</div>
+<p class="note" style="margin-bottom:12px">Chain retargeting policy</p>
+
+<div class="grid-3">
+  <div>
+    <img src="naive_ppo_init.PNG" alt="Naive PPO init">
+    <p class="note">(j) Naive init</p>
+  </div>
+  <div>
+    <img src="naive_ppo_pregrasp.PNG" alt="Naive PPO pregrasp">
+    <p class="note">(k) Naive pregrasp</p>
+  </div>
+  <div>
+    <img src="naive_ppo_manip.PNG" alt="Naive PPO manip">
+    <p class="note">(l) Naive -- fails to grasp</p>
+  </div>
+</div>
+<p class="note" style="margin-bottom:12px">Naive retargeting policy</p>
+
+<p>The green marker is the target object position; the dark circle marks the initial position on the table.</p>
+
+<hr>
+
+<h2>Key Findings</h2>
+<ul>
+  <li><strong>Retargeting quality is the critical bottleneck.</strong> Only ViViDex's reference trajectory achieves goal success (19%). Neither of our reproduced trajectories lifts the object despite comparable gradient updates. The gap appears to stem from ViViDex's undisclosed retargeting steps rather than PPO training itself.</li>
+  <li><strong>ViViDex's retargeting may not be fully described in the paper.</strong> The paper cites DexMV's naive NLopt retargeting as its method, which is what we implemented. However, our naive trajectory produces a qualitatively different and worse pregrasp posture than ViViDex's reference, suggesting additional preprocessing or post-processing steps that were not disclosed.</li>
+  <li><strong>Chain has the most potential with more training.</strong> Chain retargeting achieves 0.84 hand success and 0.55 object success, which matches the baseline's metrics just before its sharp phase transition at 80-90M steps. We believe chain would achieve goal success with longer training, as the curriculum had not yet advanced to the stage where the baseline began succeeding.</li>
+  <li><strong>Chain resolves the finger abduction failure of naive.</strong> MANO global frame initialization raises hand success from 0.18 (naive) to 0.84 (chain), confirming that orientation guidance is essential for producing physically plausible grasping postures.</li>
+  <li><strong>CPU is the binding compute constraint.</strong> MuJoCo simulation is CPU-bound. ViViDex's reported 2-hour A100 training time assumes approximately 32 dedicated CPU cores on a cluster. Our 12 Colab cores required 24-48 hours per 50M step session, limiting the total training we could achieve.</li>
+</ul>
+
+<hr>
+
+<p><a href="/">&larr; Back to Portfolio</a></p>
+
+</body>
+</html>
